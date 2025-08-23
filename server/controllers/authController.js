@@ -214,6 +214,7 @@ export const getMe = (req, res) => {
 // POST /api/auth/logout
 // =========================
 export const logout = (req, res) => {
+  console.log("Logging out user:", req.user ? req.user.email : "Unknown");
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

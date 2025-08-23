@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
-import { AuthForm } from "@/components/AuthForm";
+import { AuthForm } from "@/components/common/AuthForm";
 import { useUserStore } from "@/stores/userStore";
 import { FullPageSpinner } from "@/components/ui/full-page-spinner";
 
