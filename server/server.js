@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.send("🚀 Backend API is running");
+  res.send(`🚀 Backend API is running ${process.env.BASE_URL}`);
 });
 
 // ===== Routes =====

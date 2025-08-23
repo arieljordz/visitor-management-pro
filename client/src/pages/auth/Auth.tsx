@@ -19,12 +19,13 @@ export default function Auth() {
 
   // Redirect after successful login
   useEffect(() => {
-    console.log("Auth useEffect - isAuthenticated:", isAuthenticated, "loadingUser:", loadingUser);
     if (!loadingUser && isAuthenticated) {
-      console.log("Redirecting now...");
       navigate("/dashboard", { replace: true });
     }
   }, [isAuthenticated, loadingUser, navigate]);
+
+  console.log("VITE_BASE_API_URL:", import.meta.env.VITE_BASE_API_URL);
+  console.log("VITE_GOOGLE_API_KEY:", import.meta.env.VITE_GOOGLE_API_KEY);
 
   if (loadingUser) return <FullPageSpinner />;
 
