@@ -1,26 +1,28 @@
-import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Users, 
-  FileText, 
-  Settings, 
+import { NavLink, useLocation } from "react-router-dom";
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Settings,
   LogOut,
-  Building2
-} from 'lucide-react';
-import { useVisitorStore } from '@/store/visitorStore';
-import { Button } from '@/components/ui/button';
+  Building2,
+} from "lucide-react";
+import { useUserStore } from "@/stores/userStore";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "../ui/theme-toggle";
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Visitors', href: '/visitors', icon: Users },
-  { name: 'Reports', href: '/reports', icon: FileText },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Visitors", href: "/visitors", icon: Users },
+  { name: "Reports", href: "/reports", icon: FileText },
+  { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const location = useLocation();
-  const { user, logout } = useVisitorStore();
+  const { user, logout } = useUserStore();
 
+  // console.log("Sidebar user:", user);
   const handleLogout = () => {
     logout();
   };
@@ -52,8 +54,8 @@ export function Sidebar() {
                 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
                 ${
                   isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground'
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
                 }
               `}
             >
@@ -66,19 +68,19 @@ export function Sidebar() {
 
       {/* User Profile & Logout */}
       <div className="border-t border-sidebar-border px-4 py-4">
+        <ThemeToggle />
         <div className="mb-3">
           <p className="text-sm font-medium text-sidebar-foreground">
             {user?.name}
           </p>
-          <p className="text-xs text-sidebar-foreground/60">
-            {user?.email}
-          </p>
+          <p className="text-xs text-sidebar-foreground/60">{user?.email}</p>
         </div>
+
         <Button
           variant="outline"
           size="sm"
           onClick={handleLogout}
-          className="w-full justify-start gap-2 border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 border-sidebar-border text-sidebar-foreground bg-sidebar-accent"
         >
           <LogOut className="h-4 w-4" />
           Sign Out

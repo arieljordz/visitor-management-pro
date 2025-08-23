@@ -5,10 +5,15 @@ export const authenticate = async (req, res, next) => {
   try {
     const token = req.cookies?.token; // or whatever you named your cookie
 
+    const cookies = req.cookies;
+    // console.log("req:", req);
+    // console.log("cookies:", cookies);
     // console.log("token:", token);
     if (!token) {
       return res.status(401).json({ message: "No token, unauthorized" });
     }
+
+    // console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // use your actual secret
     // console.log("decoded:", decoded);
@@ -21,7 +26,7 @@ export const authenticate = async (req, res, next) => {
     req.user = user; // ✅ attach to request
     next();
   } catch (err) {
-    console.error("Auth middleware error:", err.message);
+    console.error("Auth middleware error:", err);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

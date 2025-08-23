@@ -1,6 +1,6 @@
 import { FileText, Download, Calendar, Filter } from 'lucide-react';
 import { useState } from 'react';
-import { useVisitorStore } from '@/store/visitorStore';
+import { useVisitorStore } from '@/stores/visitorStore';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -159,7 +159,7 @@ export default function Reports() {
               <div key={visitor.id} className="flex items-center justify-between p-4 rounded-lg border border-card-border bg-surface">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-foreground">
+                    <h3 className="font-medium text-gray-700">
                       {visitor.name}
                     </h3>
                     <span
@@ -180,7 +180,7 @@ export default function Reports() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="text-sm font-medium text-gray-700">
                     {new Intl.DateTimeFormat('en-US', {
                       month: 'short',
                       day: 'numeric',

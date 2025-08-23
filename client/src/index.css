@@ -159,3 +159,20 @@
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Light theme (default) */
+:root {
+  --background: 0 0% 100%; /* white */
+  --foreground: 240 10% 3.9%; /* blackish */
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  /* add the rest of your vars... */
+}
+
+/* Dark theme (softer, lighter dark) */
+.dark {
+  --background: 220 14% 20%;       /* lighter dark gray */
+  --foreground: 0 0% 98%;          /* almost white text */
+  --card: 220 14% 25%;             /* slightly lighter than background */
+  --card-foreground: 0 0% 98%;     /* same as text */
+}
