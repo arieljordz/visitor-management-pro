@@ -25,7 +25,7 @@ export default function Auth() {
   }, [isAuthenticated, loadingUser, navigate]);
 
   console.log("VITE_BASE_API_URL:", import.meta.env.VITE_BASE_API_URL);
-  console.log("VITE_GOOGLE_API_KEY:", import.meta.env.VITE_GOOGLE_API_KEY);
+  // console.log("VITE_GOOGLE_API_KEY:", import.meta.env.VITE_GOOGLE_API_KEY);
 
   if (loadingUser) return <FullPageSpinner />;
 
