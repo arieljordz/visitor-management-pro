@@ -1,20 +1,16 @@
 import { create } from "zustand";
 import * as userService from "@/services/authService";
 import { useSpinnerStore } from "./spinnerStore";
+import type { User, UserRole } from "@/types/user";
 
 const showSpinner = () => useSpinnerStore.getState().show();
 const hideSpinner = () => useSpinnerStore.getState().hide();
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  picture?: string;
-  isVerified: boolean;
-}
-
 interface UserStore {
   user: User | null;
+  role: UserRole | null;
+  isAdmin: boolean;
+  isStaff: boolean;
   isAuthenticated: boolean;
   loadingUser: boolean;
   error: string | null;
@@ -24,76 +20,126 @@ interface UserStore {
   googleLogin: (token: string) => Promise<void>;
   fetchUser: () => Promise<void>;
   logout: () => Promise<void>;
+  setUserState: (user: User) => void;
 }
 
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
+  role: null,
+  isAdmin: false,
+  isStaff: false,
   isAuthenticated: false,
   loadingUser: true,
   error: null,
 
-  // REGISTER
+  setUserState: (user) => {
+    set({
+      user,
+      role: user.role,
+      isAdmin: user.role === "admin",
+      isStaff: user.role === "staff",
+      isAuthenticated: true,
+      loadingUser: false,
+    });
+  },
+
   register: async (name, email, password) => {
     showSpinner();
     try {
-      const data = await userService.register(name, email, password);
-      set({ user: data, isAuthenticated: true });
+      const user = await userService.register(name, email, password);
+      set({
+        user,
+        role: user.role,
+        isAdmin: user.role === "admin",
+        isStaff: user.role === "staff",
+        isAuthenticated: true,
+        loadingUser: false,
+      });
     } catch (err: any) {
-      set({ error: err.response?.data?.message || "Registration failed" });
+      set({ error: err.response?.data?.message || "Registration failed", loadingUser: false });
       throw err;
     } finally {
       hideSpinner();
     }
   },
 
-  // LOGIN
   login: async (email, password) => {
     showSpinner();
     try {
-      const data = await userService.login(email, password);
-      console.log("Login data:", data);
-      set({ user: data, isAuthenticated: true });
+      const user = await userService.login(email, password);
+      set({
+        user,
+        role: user.role,
+        isAdmin: user.role === "admin",
+        isStaff: user.role === "staff",
+        isAuthenticated: true,
+        loadingUser: false,
+      });
     } catch (err: any) {
-      set({ error: err.response?.data?.message || "Login failed" });
+      set({ error: err.response?.data?.message || "Login failed", loadingUser: false });
       throw err;
     } finally {
       hideSpinner();
     }
   },
 
-  // GOOGLE LOGIN
   googleLogin: async (token) => {
     showSpinner();
     try {
-      const data = await userService.googleLogin(token);
-      set({ user: data, isAuthenticated: true });
+      const user = await userService.googleLogin(token);
+      set({
+        user,
+        role: user.role,
+        isAdmin: user.role === "admin",
+        isStaff: user.role === "staff",
+        isAuthenticated: true,
+        loadingUser: false,
+      });
     } catch (err: any) {
-      set({ error: err.response?.data?.message || "Google login failed" });
+      set({ error: err.response?.data?.message || "Google login failed", loadingUser: false });
       throw err;
     } finally {
       hideSpinner();
     }
   },
 
-  // FETCH CURRENT USER
   fetchUser: async () => {
     showSpinner();
     try {
-      const data = await userService.getMe();
-      set({ user: data, isAuthenticated: true, loadingUser: false });
+      const user = await userService.getMe();
+      set({
+        user,
+        role: user.role,
+        isAdmin: user.role === "admin",
+        isStaff: user.role === "staff",
+        isAuthenticated: true,
+        loadingUser: false,
+      });
     } catch {
-      set({ user: null, isAuthenticated: false, loadingUser: false });
+      set({
+        user: null,
+        role: null,
+        isAdmin: false,
+        isStaff: false,
+        isAuthenticated: false,
+        loadingUser: false,
+      });
     } finally {
       hideSpinner();
     }
   },
 
-  // LOGOUT
   logout: async () => {
     showSpinner();
     try {
       await userService.logout();
-      set({ user: null, isAuthenticated: false });
+      set({
+        user: null,
+        role: null,
+        isAdmin: false,
+        isStaff: false,
+        isAuthenticated: false,
+      });
     } finally {
       hideSpinner();
     }

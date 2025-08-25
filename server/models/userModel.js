@@ -7,6 +7,7 @@ const userModelSchema = new mongoose.Schema(
     picture: { type: String },
     password: { type: String },
     isVerified: { type: Boolean, default: true },
+     role: { type: String, enum: ["admin", "staff", "user"], default: "user" },
   },
   { timestamps: true }
 );

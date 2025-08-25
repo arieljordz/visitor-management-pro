@@ -16,7 +16,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ title, subtitle, children })
             <Building2 className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-          {subtitle && <p className="text-muted-foreground mt-2">{subtitle}</p>}
+          {subtitle && <p className="text-foreground mt-2">{subtitle}</p>}
         </div>
         <div className="card-elevated p-6 space-y-4">{children}</div>
       </div>

@@ -2,13 +2,13 @@
 import { create } from "zustand";
 
 interface SpinnerStore {
-  loading: boolean;
+  isLoading : boolean;
   show: () => void;
   hide: () => void;
 }
 
 export const useSpinnerStore = create<SpinnerStore>((set) => ({
-  loading: false,
-  show: () => set({ loading: true }),
-  hide: () => set({ loading: false }),
+  isLoading : false,
+  show: () => set({ isLoading : true }),
+  hide: () => set({ isLoading : false }),
 }));

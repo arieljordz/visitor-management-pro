@@ -1,3 +1,6 @@
+
+export type Status = "checked-in" | "checked-out";
+
 export interface Visitor {
   id: string;
   name: string;
@@ -8,7 +11,7 @@ export interface Visitor {
   hostName: string;
   checkInTime: Date;
   checkOutTime?: Date;
-  status: 'checked-in' | 'checked-out';
+  status: Status;
   photo?: string;
   visitHistory?: VisitRecord[];
 }
@@ -20,18 +23,4 @@ export interface VisitRecord {
   checkInTime: Date;
   checkOutTime?: Date;
   hostName: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'admin' | 'receptionist';
-}
-
-export interface DashboardStats {
-  totalVisitors: number;
-  currentlyInside: number;
-  checkedOut: number;
-  todayVisitors: number;
 }

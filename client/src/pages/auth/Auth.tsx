@@ -10,39 +10,60 @@ import { FullPageSpinner } from "@/components/ui/full-page-spinner";
 export default function Auth() {
   const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const navigate = useNavigate();
-  const { isAuthenticated, loadingUser, fetchUser } = useUserStore();
+  const { isAuthenticated, loadingUser, fetchUser, role } = useUserStore();
 
   // Fetch user on mount
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
 
-  // Redirect after successful login
+  // Redirect after successful login based on role
   useEffect(() => {
     if (!loadingUser && isAuthenticated) {
-      navigate("/dashboard", { replace: true });
+      switch (role) {
+        case "admin":
+          navigate("/dashboard", { replace: true });
+          break;
+        case "user":
+          navigate("/appointments", { replace: true });
+          break;
+        case "staff":
+          navigate("/reports", { replace: true });
+          break;
+        default:
+          navigate("/dashboard", { replace: true });
+      }
     }
-  }, [isAuthenticated, loadingUser, navigate]);
-
-  console.log("VITE_BASE_API_URL:", import.meta.env.VITE_BASE_API_URL);
-  // console.log("VITE_GOOGLE_API_KEY:", import.meta.env.VITE_GOOGLE_API_KEY);
+  }, [isAuthenticated, loadingUser, role, navigate]);
 
   if (loadingUser) return <FullPageSpinner />;
 
   return (
     <AuthForm
       title="VMS Pro"
-      subtitle={activeTab === "login" ? "Sign in to your account" : "Create your account"}
+      subtitle={
+        activeTab === "login"
+          ? "Sign in to your account"
+          : "Create your account"
+      }
     >
       <div className="flex border-b border-border mb-4">
         <button
-          className={`flex-1 py-2 text-center font-medium ${activeTab === "login" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}
+          className={`flex-1 py-2 text-center font-medium ${
+            activeTab === "login"
+              ? "border-b-2 border-primary text-foreground"
+              : "text-muted-foreground"
+          }`}
           onClick={() => setActiveTab("login")}
         >
           Login
         </button>
         <button
-          className={`flex-1 py-2 text-center font-medium ${activeTab === "register" ? "border-b-2 border-primary text-foreground" : "text-muted-foreground"}`}
+          className={`flex-1 py-2 text-center font-medium ${
+            activeTab === "register"
+              ? "border-b-2 border-primary text-foreground"
+              : "text-muted-foreground"
+          }`}
           onClick={() => setActiveTab("register")}
         >
           Register
@@ -50,7 +71,9 @@ export default function Auth() {
       </div>
 
       {activeTab === "login" && <LoginForm />}
-      {activeTab === "register" && <RegisterForm onSuccess={() => setActiveTab("login")} />}
+      {activeTab === "register" && (
+        <RegisterForm onSuccess={() => setActiveTab("login")} />
+      )}
     </AuthForm>
   );
 }

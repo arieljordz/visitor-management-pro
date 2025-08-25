@@ -5,12 +5,14 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { Spinner } from "./components/common/Spinner";
 
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { ProtectedRoute } from "./components/routes/ProtectedRoute";
 import Auth from "./pages/auth/Auth";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Visitors from "./pages/visitors/Visitors";
+import Appointments from "./pages/appointments/Appointments";
 import Reports from "./pages/reports/Reports";
 import Settings from "./pages/settings/Settings";
 import NotFound from "./pages/notFound/NotFound";
@@ -25,6 +27,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <GoogleOAuthProvider clientId={API_KEY}>
+          <Spinner />
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Auth />} />
@@ -52,7 +55,16 @@ const App = () => (
               >
                 <Route index element={<Visitors />} />
               </Route>
-
+              <Route
+                path="/appointments"
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Appointments />} />
+              </Route>
               <Route
                 path="/reports"
                 element={

@@ -9,25 +9,23 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogoutButton } from "@/components/common/LogoutButton";
 
 interface LogoutModalProps {
   onConfirm: () => void;
+  iconOnly?: boolean;
 }
 
-export function LogoutModal({ onConfirm }: LogoutModalProps) {
+export const LogoutModal: React.FC<LogoutModalProps> = ({
+  onConfirm,
+  iconOnly = false,
+}) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2 border-sidebar-border text-sidebar-foreground bg-sidebar-accent"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </Button>
+        <LogoutButton onClick={() => {}} iconOnly={iconOnly} />
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Confirm Logout</DialogTitle>
@@ -35,7 +33,7 @@ export function LogoutModal({ onConfirm }: LogoutModalProps) {
             Are you sure you want to sign out of your account?
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className="flex justify-end gap-2">
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
@@ -48,4 +46,4 @@ export function LogoutModal({ onConfirm }: LogoutModalProps) {
       </DialogContent>
     </Dialog>
   );
-}
+};

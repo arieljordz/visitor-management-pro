@@ -26,7 +26,7 @@ export const authenticate = async (req, res, next) => {
     req.user = user; // ✅ attach to request
     next();
   } catch (err) {
-    console.error("Auth middleware error:", err);
+    console.error("Auth middleware error:", err.message);
     return res.status(401).json({ message: "Unauthorized" });
   }
 };

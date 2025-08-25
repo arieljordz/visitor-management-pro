@@ -6,13 +6,14 @@ import userModel from "../models/userModel.js";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const generateToken = (user) => {
-  console.log("JWT_SECRET LOGIN:", process.env.JWT_SECRET);
+  // console.log("JWT_SECRET LOGIN:", process.env.JWT_SECRET);
   return jwt.sign(
     {
       userId: user._id,
       name: user.name,
       email: user.email,
       isVerified: user.isVerified,
+      role: user.role,
     },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
@@ -46,7 +47,8 @@ export const register = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      isVerified: true, // mark as verified since it's manual register
+      isVerified: true,
+      role: "user",
     });
 
     await user.save();
@@ -69,6 +71,7 @@ export const register = async (req, res) => {
       email: user.email,
       picture: user.picture,
       isVerified: user.isVerified,
+      role: user.role,
     });
   } catch (error) {
     console.error("Register error:", error);
@@ -124,6 +127,7 @@ export const login = async (req, res) => {
       email: user.email,
       picture: user.picture,
       isVerified: user.isVerified,
+      role: user.role,
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -186,6 +190,7 @@ export const googleLogin = async (req, res) => {
       email: user.email,
       picture: user.picture,
       isVerified: user.isVerified,
+      role: user.role,
     });
   } catch (error) {
     console.error("Google login error:", error);
@@ -207,6 +212,7 @@ export const getMe = (req, res) => {
     email: req.user.email,
     picture: req.user.picture,
     isVerified: req.user.isVerified,
+    role: req.user.role,
   });
 };
 
@@ -214,7 +220,7 @@ export const getMe = (req, res) => {
 // POST /api/auth/logout
 // =========================
 export const logout = (req, res) => {
-  console.log("Logging out user:", req.user ? req.user.email : "Unknown");
+  // console.log("Logging out user:", req.user ? req.user.email : "Unknown");
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

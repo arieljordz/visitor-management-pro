@@ -9,6 +9,7 @@ import connectDB from "./config/db.js";
 
 // Route imports
 import authRoutes from "./routes/authRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
 
 // Initialize Express app
 const app = express();
@@ -34,6 +35,7 @@ app.get("/", (req, res) => {
 
 // ===== Routes =====
 app.use("/api/auth", authRoutes);
+app.use("/api/appointments", appointmentRoutes);
 
 // Optional: Serve static files if you're storing images locally
 // app.use("/uploads", express.static("uploads"));

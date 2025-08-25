@@ -1,6 +1,8 @@
-import { create } from 'zustand';
-import { Visitor, User, DashboardStats } from '@/types/visitor';
-import { mockVisitors, mockUser } from '@/services/mockData';
+import { create } from "zustand";
+import { Visitor } from "@/types/visitor";
+import { User } from "@/types/user";
+import { Dashboard } from "@/types/dashboard";
+import { mockVisitors, mockUser } from "@/services/mockData";
 
 interface VisitorStore {
   // Authentication
@@ -17,7 +19,7 @@ interface VisitorStore {
   itemsPerPage: number;
 
   // Actions
-  addVisitor: (visitor: Omit<Visitor, 'id' | 'checkInTime' | 'status'>) => void;
+  addVisitor: (visitor: Omit<Visitor, "id" | "checkInTime" | "status">) => void;
   updateVisitor: (id: string, updates: Partial<Visitor>) => void;
   deleteVisitor: (id: string) => void;
   checkInVisitor: (id: string) => void;
@@ -28,7 +30,7 @@ interface VisitorStore {
 
   // Computed
   getFilteredVisitors: () => Visitor[];
-  getDashboardStats: () => DashboardStats;
+  getDashboardStats: () => Dashboard;
 }
 
 export const useVisitorStore = create<VisitorStore>((set, get) => ({
@@ -50,7 +52,7 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
   // Visitors
   visitors: mockVisitors,
   selectedVisitor: null,
-  searchTerm: '',
+  searchTerm: "",
   currentPage: 1,
   itemsPerPage: 10,
 
@@ -60,10 +62,10 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
       ...visitorData,
       id: Date.now().toString(),
       checkInTime: new Date(),
-      status: 'checked-in'
+      status: "checked-in",
     };
     set((state) => ({
-      visitors: [newVisitor, ...state.visitors]
+      visitors: [newVisitor, ...state.visitors],
     }));
   },
 
@@ -71,14 +73,15 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
     set((state) => ({
       visitors: state.visitors.map((visitor) =>
         visitor.id === id ? { ...visitor, ...updates } : visitor
-      )
+      ),
     }));
   },
 
   deleteVisitor: (id) => {
     set((state) => ({
       visitors: state.visitors.filter((visitor) => visitor.id !== id),
-      selectedVisitor: state.selectedVisitor?.id === id ? null : state.selectedVisitor
+      selectedVisitor:
+        state.selectedVisitor?.id === id ? null : state.selectedVisitor,
     }));
   },
 
@@ -86,9 +89,13 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
     set((state) => ({
       visitors: state.visitors.map((visitor) =>
         visitor.id === id
-          ? { ...visitor, status: 'checked-in' as const, checkOutTime: undefined }
+          ? {
+              ...visitor,
+              status: "checked-in" as const,
+              checkOutTime: undefined,
+            }
           : visitor
-      )
+      ),
     }));
   },
 
@@ -96,9 +103,13 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
     set((state) => ({
       visitors: state.visitors.map((visitor) =>
         visitor.id === id
-          ? { ...visitor, status: 'checked-out' as const, checkOutTime: new Date() }
+          ? {
+              ...visitor,
+              status: "checked-out" as const,
+              checkOutTime: new Date(),
+            }
           : visitor
-      )
+      ),
     }));
   },
 
@@ -110,16 +121,17 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
   getFilteredVisitors: () => {
     const { visitors, searchTerm } = get();
     if (!searchTerm) return visitors;
-    
-    return visitors.filter((visitor) =>
-      visitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      visitor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      visitor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      visitor.purpose.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return visitors.filter(
+      (visitor) =>
+        visitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        visitor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        visitor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        visitor.purpose.toLowerCase().includes(searchTerm.toLowerCase())
     );
   },
 
-  getDashboardStats: (): DashboardStats => {
+  getDashboardStats: (): Dashboard => {
     const { visitors } = get();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -130,9 +142,9 @@ export const useVisitorStore = create<VisitorStore>((set, get) => ({
 
     return {
       totalVisitors: visitors.length,
-      currentlyInside: visitors.filter((v) => v.status === 'checked-in').length,
-      checkedOut: visitors.filter((v) => v.status === 'checked-out').length,
-      todayVisitors: todayVisitors.length
+      currentlyInside: visitors.filter((v) => v.status === "checked-in").length,
+      checkedOut: visitors.filter((v) => v.status === "checked-out").length,
+      todayVisitors: todayVisitors.length,
     };
-  }
+  },
 }));
