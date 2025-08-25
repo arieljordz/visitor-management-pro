@@ -25,7 +25,7 @@ export default function Auth() {
           navigate("/dashboard", { replace: true });
           break;
         case "user":
-          navigate("/appointments", { replace: true });
+          navigate("/visitors", { replace: true });
           break;
         case "staff":
           navigate("/reports", { replace: true });

@@ -25,7 +25,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavItemProps[] = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
-    { name: "Visitors", href: "/visitors", icon: Users, roles: ["admin", "user"] },
+    { name: "Visitors", href: "/visitors", icon: Users, roles: ["user"] },
     { name: "Appointments", href: "/appointments", icon: Calendar, roles: ["admin", "user"] },
     { name: "Reports", href: "/reports", icon: FileText, roles: ["admin", "staff"] },
     { name: "Scan QR", href: "/scan-qr", icon: QrCode, roles: ["staff"] },
@@ -41,7 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         key={item.name}
         to={item.href}
         onClick={() => setMobileOpen(false)}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+        className={`flex items-center gap-3 rounded mb-1 px-3 py-2 text-sm font-medium transition-colors ${
           isActive
             ? "bg-sidebar-accent text-sidebar-accent-foreground"
             : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"

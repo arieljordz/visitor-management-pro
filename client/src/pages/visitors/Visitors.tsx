@@ -1,99 +1,99 @@
-import { useState } from 'react';
-import { 
-  Users, 
-  Plus, 
-  Search, 
-  Edit2, 
-  Trash2, 
-  UserCheck, 
-  UserX,
-  MoreHorizontal 
-} from 'lucide-react';
-import { useVisitorStore } from '@/stores/visitorStore';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { VisitorModal } from '@/components/visitors/VisitorModal';
-import { Visitor } from '@/types/visitor';
-import { useToast } from '@/hooks/use-toast';
+// src/pages/Visitors.tsx
+import { useState, useEffect } from "react";
+import { User, Plus } from "lucide-react";
+import { useVisitorStore } from "@/stores/visitorStore";
+import { useUserStore } from "@/stores/userStore";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { Visitor } from "@/types/visitor";
+import { VisitorModal } from "@/components/visitors/VisitorModal";
+import { VisitorTable } from "@/components/visitors/VisitorTable";
+import { SearchInput } from "@/components/common/SearchInput";
+import { Pagination } from "@/components/common/Pagination";
+import { ConfirmationModal } from "@/components/common/ConfirmationModal";
 
 export default function Visitors() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [modalMode, setModalMode] = useState<"add" | "edit">("add");
   const [selectedVisitor, setSelectedVisitor] = useState<Visitor | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<Visitor | null>(null);
+  const itemsPerPage = 5;
 
+  const { isAdmin } = useUserStore();
   const {
+    visitors,
+    total,
     searchTerm,
+    message,
     setSearchTerm,
-    getFilteredVisitors,
+    clearMessage,
+    fetchVisitors,
+    searchVisitors,
     deleteVisitor,
-    checkInVisitor,
-    checkOutVisitor,
   } = useVisitorStore();
 
   const { toast } = useToast();
 
-  const filteredVisitors = getFilteredVisitors();
+  // Fetch visitors on mount + when page changes
+  useEffect(() => {
+    fetchVisitors(currentPage, itemsPerPage);
+  }, [fetchVisitors, currentPage]);
 
-  const handleAddVisitor = () => {
-    setModalMode('add');
-    setSelectedVisitor(null);
+  // Show toast on store message (errors/success)
+  useEffect(() => {
+    if (message) {
+      toast({
+        title: "Notice",
+        description: message,
+        variant: message.toLowerCase().includes("error")
+          ? "destructive"
+          : "default",
+      });
+      clearMessage();
+    }
+  }, [message, toast, clearMessage]);
+
+  // Filter visitors based on search
+  const filteredData = Array.isArray(visitors)
+    ? visitors.filter((v) => {
+        if (!searchTerm) return true;
+
+        const lowerSearch = searchTerm.toLowerCase();
+
+        return [v.fullname, v.firstname, v.lastname, v.email, v.company].some(
+          (field) => (field ?? "").toLowerCase().includes(lowerSearch)
+        );
+      })
+    : [];
+
+  // Pagination logic
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Open modal for add/edit
+  const openModal = (mode: "add" | "edit", visitor?: Visitor) => {
+    setModalMode(mode);
+    setSelectedVisitor(visitor || null);
     setIsModalOpen(true);
   };
 
-  const handleEditVisitor = (visitor: Visitor) => {
-    setModalMode('edit');
-    setSelectedVisitor(visitor);
-    setIsModalOpen(true);
+  // Confirm delete
+  const handleDelete = (visitor: Visitor) => {
+    setDeleteTarget(visitor);
   };
 
-  const handleDeleteVisitor = (visitor: Visitor) => {
-    deleteVisitor(visitor.id);
-    toast({
-      title: 'Visitor removed',
-      description: `${visitor.name} has been removed from the system.`,
-    });
-  };
-
-  const handleToggleStatus = (visitor: Visitor) => {
-    if (visitor.status === 'checked-in') {
-      checkOutVisitor(visitor.id);
-      toast({
-        title: 'Visitor checked out',
-        description: `${visitor.name} has been checked out.`,
-      });
-    } else {
-      checkInVisitor(visitor.id);
-      toast({
-        title: 'Visitor checked in',
-        description: `${visitor.name} has been checked in.`,
-      });
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      deleteVisitor(deleteTarget.id);
+      setDeleteTarget(null);
     }
   };
 
-  const formatDateTime = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    }).format(new Date(date));
-  };
+  const cancelDelete = () => setDeleteTarget(null);
 
   return (
     <div className="space-y-6">
@@ -105,158 +105,51 @@ export default function Visitors() {
             Manage and track all visitor activities
           </p>
         </div>
-        <Button onClick={handleAddVisitor} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Add Visitor
-        </Button>
+        {!isAdmin && (
+          <Button onClick={() => openModal("add")} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Visitor
+          </Button>
+        )}
       </div>
 
-      {/* Search and Filters */}
+      {/* Search */}
       <Card className="card-elevated">
         <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search visitors..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="h-4 w-4" />
-              {filteredVisitors.length} visitors
-            </div>
-          </div>
+          <SearchInput
+            value={searchTerm}
+            onChange={(value) => {
+              setSearchTerm(value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search visitors..."
+          />
         </CardContent>
       </Card>
 
       {/* Visitors Table */}
-      <Card className="card-elevated">
+      <Card className="card-elevated relative">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
+            <User className="h-5 w-5 text-primary" />
             All Visitors
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border border-card-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="table-header">
-                  <TableHead>Visitor</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Purpose</TableHead>
-                  <TableHead>Host</TableHead>
-                  <TableHead>Check-in Time</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredVisitors.map((visitor) => (
-                  <TableRow key={visitor.id} className="table-row">
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-foreground">
-                          {visitor.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {visitor.email}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {visitor.company}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {visitor.purpose}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {visitor.hostName}
-                    </TableCell>
-                    <TableCell className="text-foreground">
-                      {formatDateTime(visitor.checkInTime)}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={
-                          visitor.status === 'checked-in'
-                            ? 'status-success'
-                            : 'status-warning'
-                        }
-                      >
-                        {visitor.status === 'checked-in' ? 'Checked In' : 'Checked Out'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem
-                            onClick={() => handleToggleStatus(visitor)}
-                            className="gap-2"
-                          >
-                            {visitor.status === 'checked-in' ? (
-                              <>
-                                <UserX className="h-4 w-4" />
-                                Check Out
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="h-4 w-4" />
-                                Check In
-                              </>
-                            )}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleEditVisitor(visitor)}
-                            className="gap-2"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                            Edit Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteVisitor(visitor)}
-                            className="gap-2 text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                            Remove Visitor
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <VisitorTable
+            visitors={paginatedData}
+            isAdmin={isAdmin}
+            onEdit={(v: any) => openModal("edit", v)}
+            onDelete={handleDelete}
+          />
 
-            {filteredVisitors.length === 0 && (
-              <div className="text-center py-12">
-                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
-                  No visitors found
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  {searchTerm 
-                    ? 'Try adjusting your search terms' 
-                    : 'Get started by adding your first visitor'
-                  }
-                </p>
-                {!searchTerm && (
-                  <Button onClick={handleAddVisitor} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add First Visitor
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
+          {/* Pagination */}
+          <Pagination
+            totalItems={total}
+            itemsPerPage={itemsPerPage}
+            maxPageButtons={5}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         </CardContent>
       </Card>
 
@@ -267,6 +160,17 @@ export default function Visitors() {
         visitor={selectedVisitor}
         mode={modalMode}
       />
+
+      {/* Confirmation Modal for Delete */}
+      {deleteTarget && (
+        <ConfirmationModal
+          isOpen={true}
+          title="Confirm Delete"
+          message={`Are you sure you want to delete ${deleteTarget.fullname}?`}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+        />
+      )}
     </div>
   );
 }

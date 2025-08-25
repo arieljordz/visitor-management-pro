@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Calendar, Plus } from "lucide-react";
-import { useAppointmentsStore } from "@/stores/appointmentsStore";
+import { useAppointmentsStore } from "@/stores/appointmentStore";
 import { useUserStore } from "@/stores/userStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,7 +55,7 @@ export default function Appointments() {
   }, [message, toast, clearMessage]);
 
   // Filter appointments based on search
-  const filteredAppointments = Array.isArray(appointments)
+  const filteredData = Array.isArray(appointments)
     ? appointments.filter((a) =>
         searchTerm
           ? [a.name, a.hostName, a.purpose].some((field) =>
@@ -66,7 +66,7 @@ export default function Appointments() {
     : [];
 
   // Pagination logic
-  const paginatedAppointments = filteredAppointments.slice(
+  const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -133,7 +133,7 @@ export default function Appointments() {
         </CardHeader>
         <CardContent>
           <AppointmentTable
-            appointments={paginatedAppointments}
+            appointments={paginatedData}
             isAdmin={isAdmin}
             onEdit={(appt) => openModal("edit", appt)}
             onDelete={handleDelete}
@@ -143,7 +143,7 @@ export default function Appointments() {
 
           {/* Pagination */}
           <Pagination
-            totalItems={filteredAppointments.length}
+            totalItems={filteredData.length}
             itemsPerPage={5}
             maxPageButtons={5}
             onPageChange={(page) => setCurrentPage(page)}

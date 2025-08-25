@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { useAppointmentsStore } from "@/stores/appointmentsStore";
+import { useAppointmentsStore } from "@/stores/appointmentStore";
 import { useUserStore } from "@/stores/userStore";
 import { useToast } from "@/hooks/use-toast";
 import { Appointment } from "@/types/appointment";
@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { AppointmentForm } from "@/components/appointments/AppointmentForm";
+import { FieldForm } from "@/components/common/FieldForm";
 
 // ---------------------------
 // Schema
@@ -75,11 +75,11 @@ export const AppointmentModal: React.FC<Props> = ({
       });
     } else {
       reset({
-        name: user?.name || "",
-        email: user?.email || "",
+        name: "",
+        email: "",
         phone: "",
         company: "",
-        hostName: "",
+        hostName: user?.name || "",
         purpose: "",
         visitDate: now,
         status: "pending",
@@ -136,16 +136,19 @@ export const AppointmentModal: React.FC<Props> = ({
       name: "phone",
       label: "Phone",
       placeholder: "Enter phone number",
+      readOnly: true, 
     },
     {
       name: "company",
       label: "Company",
       placeholder: "Enter company name",
+      readOnly: true, 
     },
     {
       name: "hostName",
       label: "Host",
       placeholder: "Enter host name",
+      readOnly: true, 
     },
     {
       name: "purpose",
@@ -176,7 +179,7 @@ export const AppointmentModal: React.FC<Props> = ({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {fields.map((field) => (
-              <AppointmentForm
+              <FieldForm
                 key={field.name}
                 {...field}
                 register={register}
@@ -185,7 +188,7 @@ export const AppointmentModal: React.FC<Props> = ({
             ))}
 
             {isAdmin && mode === "edit" && (
-              <AppointmentForm
+              <FieldForm
                 name="status"
                 label="Status"
                 as="select"

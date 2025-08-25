@@ -6,7 +6,7 @@ import { Appointment } from "@/types/appointment";
 const showSpinner = () => useSpinnerStore.getState().show();
 const hideSpinner = () => useSpinnerStore.getState().hide();
 
-interface AppointmentsStore {
+interface AppointmentStore {
   appointments: Appointment[];
   searchTerm: string;
   message: string | null;
@@ -24,7 +24,7 @@ interface AppointmentsStore {
   clearMessage: () => void;
 }
 
-export const useAppointmentsStore = create<AppointmentsStore>((set, get) => ({
+export const useAppointmentsStore = create<AppointmentStore>((set, get) => ({
   appointments: [],
   searchTerm: "",
   message: null,

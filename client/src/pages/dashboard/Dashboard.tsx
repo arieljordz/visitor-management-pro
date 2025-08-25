@@ -2,14 +2,14 @@ import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Users, UserCheck, UserX, Calendar } from "lucide-react";
 import { useUserStore } from "@/stores/userStore";
-import { useVisitorStore } from "@/stores/visitorStore";
+import { useDashboardStore } from "@/stores/dashboardStore"; // ✅ swapped here
 import { StatCard } from "@/components/ui/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, isAuthenticated, fetchUser, loadingUser } = useUserStore();
-  const { visitors, getDashboardStats } = useVisitorStore();
+  const { stats, recentVisitors, fetchDashboardStats } = useDashboardStore();
 
   // Fetch user on mount
   useEffect(() => {
@@ -23,24 +23,19 @@ export default function Dashboard() {
     }
   }, [loadingUser, isAuthenticated, navigate]);
 
-  const stats = getDashboardStats();
+  // Mock fetch stats on mount
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [fetchDashboardStats]);
 
-  // Recent visitors (last 5)
-  const recentVisitors = visitors
-    .sort(
-      (a, b) =>
-        new Date(b.checkInTime).getTime() - new Date(a.checkInTime).getTime()
-    )
-    .slice(0, 5);
-
-  const formatTime = (date: Date) =>
+  const formatTime = (date: string | Date) =>
     new Intl.DateTimeFormat("en-US", {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     }).format(new Date(date));
 
-  const formatDate = (date: Date) =>
+  const formatDate = (date: string | Date) =>
     new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(
       new Date(date)
     );
@@ -150,55 +145,63 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Quick Actions */}
+        {/* Quick Actions */}{" "}
         <Card className="card-elevated">
+          {" "}
           <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
+            {" "}
+            <CardTitle>Quick Actions</CardTitle>{" "}
+          </CardHeader>{" "}
           <CardContent>
+            {" "}
             <div className="grid grid-cols-2 gap-4">
+              {" "}
               <Link
                 to="/visitors"
                 className="flex flex-col items-center gap-2 p-4 rounded-lg border border-card-border hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors"
               >
-                <UserCheck className="h-8 w-8 text-primary" />
+                {" "}
+                <UserCheck className="h-8 w-8 text-primary" />{" "}
                 <span className="text-sm font-medium text-foreground">
-                  Check In
-                </span>
-              </Link>
-
+                  {" "}
+                  Check In{" "}
+                </span>{" "}
+              </Link>{" "}
               <Link
                 to="/visitors"
                 className="flex flex-col items-center gap-2 p-4 rounded-lg border border-card-border hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors"
               >
-                <UserX className="h-8 w-8 text-muted-foreground" />
+                {" "}
+                <UserX className="h-8 w-8 text-muted-foreground" />{" "}
                 <span className="text-sm font-medium text-foreground">
-                  Check Out
-                </span>
-              </Link>
-
+                  {" "}
+                  Check Out{" "}
+                </span>{" "}
+              </Link>{" "}
               <Link
                 to="/visitors"
                 className="flex flex-col items-center gap-2 p-4 rounded-lg border border-card-border hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors"
               >
-                <Users className="h-8 w-8 text-success" />
+                {" "}
+                <Users className="h-8 w-8 text-success" />{" "}
                 <span className="text-sm font-medium text-foreground">
-                  Add Visitor
-                </span>
-              </Link>
-
+                  {" "}
+                  Add Visitor{" "}
+                </span>{" "}
+              </Link>{" "}
               <Link
                 to="/reports"
                 className="flex flex-col items-center gap-2 p-4 rounded-lg border border-card-border hover:bg-blue-100 dark:hover:bg-blue-700 transition-colors"
               >
-                <Calendar className="h-8 w-8 text-warning" />
+                {" "}
+                <Calendar className="h-8 w-8 text-warning" />{" "}
                 <span className="text-sm font-medium text-foreground">
-                  View Reports
-                </span>
-              </Link>
-            </div>
-          </CardContent>
+                  {" "}
+                  View Reports{" "}
+                </span>{" "}
+              </Link>{" "}
+            </div>{" "}
+          </CardContent>{" "}
         </Card>
       </div>
     </div>

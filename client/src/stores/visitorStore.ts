@@ -1,150 +1,144 @@
+// src/stores/visitorStore.ts
 import { create } from "zustand";
+import * as visitorService from "@/services/visitorService";
+import { useSpinnerStore } from "./spinnerStore";
 import { Visitor } from "@/types/visitor";
-import { User } from "@/types/user";
-import { Dashboard } from "@/types/dashboard";
-import { mockVisitors, mockUser } from "@/services/mockData";
+
+const showSpinner = () => useSpinnerStore.getState().show();
+const hideSpinner = () => useSpinnerStore.getState().hide();
 
 interface VisitorStore {
-  // Authentication
-  user: User | null;
-  isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
-
-  // Visitors
   visitors: Visitor[];
-  selectedVisitor: Visitor | null;
+  total: number;
+  page: number;
+  pages: number;
   searchTerm: string;
-  currentPage: number;
-  itemsPerPage: number;
+  message: string | null;
 
-  // Actions
-  addVisitor: (visitor: Omit<Visitor, "id" | "checkInTime" | "status">) => void;
-  updateVisitor: (id: string, updates: Partial<Visitor>) => void;
-  deleteVisitor: (id: string) => void;
-  checkInVisitor: (id: string) => void;
-  checkOutVisitor: (id: string) => void;
-  setSelectedVisitor: (visitor: Visitor | null) => void;
   setSearchTerm: (term: string) => void;
-  setCurrentPage: (page: number) => void;
+  clearMessage: () => void;
 
-  // Computed
-  getFilteredVisitors: () => Visitor[];
-  getDashboardStats: () => Dashboard;
+  fetchVisitors: (page?: number, limit?: number) => Promise<void>;
+  searchVisitors: (q: string, page?: number, limit?: number) => Promise<void>;
+  addVisitor: (
+    visitor: Omit<
+      Visitor,
+      "id" | "fullname" | "createdAt" | "updatedAt"
+    >
+  ) => Promise<void>;
+  updateVisitor: (visitor: Visitor) => Promise<void>;
+  deleteVisitor: (id: string) => Promise<void>;
 }
 
 export const useVisitorStore = create<VisitorStore>((set, get) => ({
-  // Authentication
-  user: null,
-  isAuthenticated: false,
-  login: async (email: string, password: string) => {
-    // Mock authentication - accept any email/password for demo
-    if (email && password) {
-      set({ user: mockUser, isAuthenticated: true });
-      return true;
-    }
-    return false;
-  },
-  logout: () => {
-    set({ user: null, isAuthenticated: false });
-  },
-
-  // Visitors
-  visitors: mockVisitors,
-  selectedVisitor: null,
+  visitors: [],
+  total: 0,
+  page: 1,
+  pages: 1,
   searchTerm: "",
-  currentPage: 1,
-  itemsPerPage: 10,
+  message: null,
 
-  // Actions
-  addVisitor: (visitorData) => {
-    const newVisitor: Visitor = {
-      ...visitorData,
-      id: Date.now().toString(),
-      checkInTime: new Date(),
-      status: "checked-in",
-    };
-    set((state) => ({
-      visitors: [newVisitor, ...state.visitors],
-    }));
+  setSearchTerm: (term) => set({ searchTerm: term }),
+  clearMessage: () => set({ message: null }),
+
+  fetchVisitors: async (page = 1, limit = 10) => {
+    showSpinner();
+    try {
+      const data = await visitorService.getVisitors(page, limit);
+      console.log("Fetched visitors:", data);
+      set({
+        visitors: data.visitors,
+        total: data.total,
+        page: data.page,
+        pages: data.pages,
+        message: null,
+      });
+    } catch (err: any) {
+      set({
+        visitors: [],
+        total: 0,
+        page: 1,
+        pages: 1,
+        message: err?.message || "Error fetching visitors",
+      });
+    } finally {
+      hideSpinner();
+    }
   },
 
-  updateVisitor: (id, updates) => {
-    set((state) => ({
-      visitors: state.visitors.map((visitor) =>
-        visitor.id === id ? { ...visitor, ...updates } : visitor
-      ),
-    }));
+  searchVisitors: async (q: string, page = 1, limit = 10) => {
+    showSpinner();
+    try {
+      const data = await visitorService.searchVisitors(q, page, limit);
+      console.log("Searched visitors:", data);
+      set({
+        visitors: data.visitors,
+        total: data.total,
+        page: data.page,
+        pages: data.pages,
+        message: null,
+      });
+    } catch (err: any) {
+      set({
+        visitors: [],
+        total: 0,
+        page: 1,
+        pages: 1,
+        message: err?.message || "Error searching visitors",
+      });
+    } finally {
+      hideSpinner();
+    }
   },
 
-  deleteVisitor: (id) => {
-    set((state) => ({
-      visitors: state.visitors.filter((visitor) => visitor.id !== id),
-      selectedVisitor:
-        state.selectedVisitor?.id === id ? null : state.selectedVisitor,
-    }));
+  addVisitor: async (visitor) => {
+    showSpinner();
+    try {
+      const newVisitor = await visitorService.addVisitor(visitor);
+      console.log("Added visitor:", newVisitor);
+      set((state) => ({
+        visitors: [...state.visitors, newVisitor],
+        total: state.total + 1,
+        message: "Visitor added successfully",
+      }));
+    } catch (err: any) {
+      set({ message: err?.message || "Failed to add visitor" });
+    } finally {
+      hideSpinner();
+    }
   },
 
-  checkInVisitor: (id) => {
-    set((state) => ({
-      visitors: state.visitors.map((visitor) =>
-        visitor.id === id
-          ? {
-              ...visitor,
-              status: "checked-in" as const,
-              checkOutTime: undefined,
-            }
-          : visitor
-      ),
-    }));
+  updateVisitor: async (visitor) => {
+    showSpinner();
+    try {
+      const updated = await visitorService.updateVisitor(visitor);
+      console.log("Updated visitor:", updated);
+      set((state) => ({
+        visitors: state.visitors.map((v) =>
+          v.id === updated.id ? updated : v
+        ),
+        message: "Visitor updated successfully",
+      }));
+    } catch (err: any) {
+      set({ message: err?.message || "Failed to update visitor" });
+    } finally {
+      hideSpinner();
+    }
   },
 
-  checkOutVisitor: (id) => {
-    set((state) => ({
-      visitors: state.visitors.map((visitor) =>
-        visitor.id === id
-          ? {
-              ...visitor,
-              status: "checked-out" as const,
-              checkOutTime: new Date(),
-            }
-          : visitor
-      ),
-    }));
-  },
-
-  setSelectedVisitor: (visitor) => set({ selectedVisitor: visitor }),
-  setSearchTerm: (term) => set({ searchTerm: term, currentPage: 1 }),
-  setCurrentPage: (page) => set({ currentPage: page }),
-
-  // Computed
-  getFilteredVisitors: () => {
-    const { visitors, searchTerm } = get();
-    if (!searchTerm) return visitors;
-
-    return visitors.filter(
-      (visitor) =>
-        visitor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        visitor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        visitor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        visitor.purpose.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  },
-
-  getDashboardStats: (): Dashboard => {
-    const { visitors } = get();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const todayVisitors = visitors.filter(
-      (visitor) => visitor.checkInTime >= today
-    );
-
-    return {
-      totalVisitors: visitors.length,
-      currentlyInside: visitors.filter((v) => v.status === "checked-in").length,
-      checkedOut: visitors.filter((v) => v.status === "checked-out").length,
-      todayVisitors: todayVisitors.length,
-    };
+  deleteVisitor: async (id) => {
+    showSpinner();
+    try {
+      await visitorService.deleteVisitor(id);
+      set((state) => ({
+        visitors: state.visitors.filter((v) => v.id !== id),
+        total: state.total - 1,
+        message: "Visitor deleted successfully",
+      }));
+    } catch (err: any) {
+      set({ message: err?.message || "Failed to delete visitor" });
+    } finally {
+      hideSpinner();
+    }
   },
 }));

@@ -1,13 +1,18 @@
-import { Settings as SettingsIcon, User, Bell, Shield, Database } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { useVisitorStore } from '@/stores/visitorStore';
+import {
+  Settings as SettingsIcon,
+  User,
+  Bell,
+  Shield,
+  Database,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { useVisitorStore } from "@/stores/visitorStore";
 
 export default function Settings() {
-  const { user } = useVisitorStore();
 
   return (
     <div className="space-y-6">
@@ -33,34 +38,32 @@ export default function Settings() {
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
-                defaultValue={user?.name}
+                defaultValue={""}
                 placeholder="Enter your full name"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email Address</Label>
               <Input
                 id="email"
                 type="email"
-                defaultValue={user?.email}
+                defaultValue={""}
                 placeholder="Enter your email"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="role">Role</Label>
               <Input
                 id="role"
-                defaultValue={user?.role}
+                defaultValue={""}
                 disabled
                 className="bg-muted"
               />
             </div>
-            
-            <Button className="w-full">
-              Update Profile
-            </Button>
+
+            <Button className="w-full">Update Profile</Button>
           </CardContent>
         </Card>
 
@@ -82,7 +85,7 @@ export default function Settings() {
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Check-out Reminders</Label>
@@ -92,7 +95,7 @@ export default function Settings() {
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Daily Reports</Label>
@@ -122,7 +125,7 @@ export default function Settings() {
                 placeholder="Enter current password"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="newPassword">New Password</Label>
               <Input
@@ -131,7 +134,7 @@ export default function Settings() {
                 placeholder="Enter new password"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
@@ -140,7 +143,7 @@ export default function Settings() {
                 placeholder="Confirm new password"
               />
             </div>
-            
+
             <Button variant="outline" className="w-full">
               Change Password
             </Button>
@@ -165,7 +168,7 @@ export default function Settings() {
               </div>
               <Switch defaultChecked />
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Visitor Photos</Label>
@@ -175,12 +178,12 @@ export default function Settings() {
               </div>
               <Switch />
             </div>
-            
+
             <div className="space-y-4 pt-4 border-t border-card-border">
               <Button variant="outline" className="w-full">
                 Export All Data
               </Button>
-              
+
               <Button variant="destructive" className="w-full">
                 Clear All Data
               </Button>

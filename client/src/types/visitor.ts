@@ -1,19 +1,19 @@
-
 export type Status = "checked-in" | "checked-out";
 
+// src/types/visitor.ts
 export interface Visitor {
   id: string;
-  name: string;
+  firstname: string;
+  middlename?: string;
+  lastname: string;
+  fullname: string;
   email: string;
   phone: string;
-  company: string;
-  purpose: string;
-  hostName: string;
-  checkInTime: Date;
-  checkOutTime?: Date;
-  status: Status;
-  photo?: string;
-  visitHistory?: VisitRecord[];
+  address?: string;
+  company?: string;
+  hostId: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface VisitRecord {
