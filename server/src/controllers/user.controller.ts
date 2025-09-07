@@ -15,18 +15,17 @@ interface AuthRequest extends Request {
 // Get all users (Admin only)
 export const getAllUsers = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    // Query parameters for filtering, pagination, and sorting
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    // 🔹 Query parameters
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
     const search = req.query.search as string;
     const sortColumn = (req.query.sortColumn as string) || "createdAt";
-    const sortOrder = (req.query.sortOrder as string) === "asc" ? 1 : -1;
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
 
-    // Build query object
+    // 🔹 Build query
     const query: Record<string, any> = {};
-
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: "i" } },
@@ -34,33 +33,37 @@ export const getAllUsers = asyncHandler(
       ];
     }
 
-    // Get total count for pagination
+    // 🔹 Count first
     const totalUsers = await User.countDocuments(query);
 
-    console.log("Query:", query);
-    // Get users with pagination + sorting
+    // 🔹 Fetch users
     const users = await User.find(query)
       .select("-password")
       .sort({ [sortColumn]: sortOrder })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean(); // return plain JS objects
 
-    // console.log("users:", users);
+    // 🔹 Map _id → id
+    const usersWithId = users.map((u) => ({
+      ...u,
+      id: u._id.toString(),
+    }));
+
+    // 🔹 Pagination info
     const totalPages = Math.ceil(totalUsers / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
 
     res.status(200).json({
       success: true,
       message: "Users retrieved successfully",
       data: {
-        users,
+        users: usersWithId,
         pagination: {
           currentPage: page,
           totalPages,
           totalUsers,
-          hasNextPage,
-          hasPrevPage,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
           limit,
           sortColumn,
           sortOrder: sortOrder === 1 ? "asc" : "desc",

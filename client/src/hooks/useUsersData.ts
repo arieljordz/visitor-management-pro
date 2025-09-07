@@ -42,15 +42,17 @@ export const useUsersData = () => {
           sortOrder as any
         )
       ).data,
-    placeholderData: keepPreviousData, // ✅ replaces keepPreviousData
+    placeholderData: keepPreviousData,
   });
-  console.log("data:", data);
+  // console.log("data:", data);
   const users: User[] = data?.users ?? [];
   const pagination = data?.pagination;
 
   // 🔹 Modal state
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   /** 🔹 Modal Handlers */
   const openCreateModal = useCallback(() => {
@@ -73,6 +75,7 @@ export const useUsersData = () => {
     async (formData: Partial<User>) => {
       try {
         if (editingUser) {
+          console.log("editingUser:", editingUser);
           await usersService.updateUser(editingUser.id, formData);
           toast.success("User updated successfully.");
         } else {
@@ -85,11 +88,32 @@ export const useUsersData = () => {
         closeModal();
       } catch (err: any) {
         console.error("❌ Error saving user:", err.message);
-        toast.error("Failed to save user.");
+        toast.error(err.message);
       }
     },
     [editingUser, closeModal, queryClient]
   );
+
+  /** 🔹 Delete Handler */
+  const requestDelete = useCallback((id: string) => {
+    setConfirmDeleteId(id);
+    setIsConfirmOpen(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    if (!confirmDeleteId) return;
+    try {
+      await usersService.deleteUser(confirmDeleteId);
+      toast.success("User deleted successfully.");
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    } catch (err: any) {
+      console.error("❌ Error deleting user:", err.message);
+      toast.error("Failed to delete user.");
+    } finally {
+      setIsConfirmOpen(false);
+      setConfirmDeleteId(null);
+    }
+  }, [confirmDeleteId, queryClient]);
 
   /** 🔹 Sorting Handler */
   const handleSort = useCallback(
@@ -131,5 +155,9 @@ export const useUsersData = () => {
     // Handlers
     handleSaveUser,
     handleSort,
+    requestDelete,
+    isConfirmOpen,
+    setIsConfirmOpen,
+    confirmDelete,
   };
 };

@@ -37,7 +37,7 @@ router.post('/', createUser); // ⬅️ Create new user (Admin only)
 router.get('/', getAllUsers);
 router.get('/stats', getUserStats);
 router.get('/:id', getUserById);
-router.patch('/:id', updateUser);
+router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
 router.patch('/:id/toggle-status', toggleUserStatus);
 

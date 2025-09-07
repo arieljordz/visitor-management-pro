@@ -86,10 +86,11 @@ class UsersService {
     const res = await this.makeAuthenticatedRequest(
       `${API_ENDPOINTS.users}/${id}`,
       {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify(payload),
       }
     );
+    console.log("Updateres:", res);
     const data: User = await res.json();
     if (!res.ok)
       throw new Error((data as any).message || "Failed to update user");

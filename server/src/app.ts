@@ -11,7 +11,7 @@ app.use(
   cors({
     origin: process.env.CLIENT_URL || 'http://localhost:8080', // your React app
     credentials: true, // allow cookies/credentials
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );

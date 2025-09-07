@@ -10,6 +10,7 @@ import { useUsersData } from "@/hooks/useUsersData";
 import { Plus } from "lucide-react";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";
+import ActionConfirmModal from "@/components/ui/ActionConfirmModal";
 
 const UsersPage: React.FC = () => {
   const {
@@ -40,6 +41,10 @@ const UsersPage: React.FC = () => {
     // Handlers
     handleSaveUser,
     handleSort,
+    requestDelete,
+    isConfirmOpen,
+    setIsConfirmOpen,
+    confirmDelete,
   } = useUsersData();
 
   if (isLoading) return <p>Loading users...</p>;
@@ -84,6 +89,8 @@ const UsersPage: React.FC = () => {
           sortColumn={sortColumn}
           sortDirection={sortOrder}
           onSort={handleSort}
+          onEdit={openEditModal}
+          onDelete={requestDelete}
         />
 
         {pagination && (
@@ -101,8 +108,15 @@ const UsersPage: React.FC = () => {
       <UserCreateModal
         isOpen={isModalOpen}
         editingUser={editingUser}
-        onCancel={() => openCreateModal()}
+        onCancel={() => closeModal()}
         onSave={handleSaveUser}
+      />
+      <ActionConfirmModal
+        isOpen={isConfirmOpen}
+        type="delete"
+        message="Are you sure you want to delete?"
+        onConfirm={confirmDelete}
+        onCancel={() => setIsConfirmOpen(false)}
       />
     </div>
   );

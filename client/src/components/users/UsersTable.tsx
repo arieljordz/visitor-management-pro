@@ -11,6 +11,8 @@ interface UsersTableProps {
   sortColumn: keyof User | "createdAt";
   sortDirection: "asc" | "desc";
   onSort: (column: keyof User | "createdAt") => void;
+  onEdit: (data: Partial<User>) => void;
+  onDelete: (id: string) => void;
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({
@@ -18,6 +20,8 @@ const UsersTable: React.FC<UsersTableProps> = ({
   sortColumn,
   sortDirection,
   onSort,
+  onEdit,
+  onDelete,
 }) => {
   const columns: Column[] = [
     { key: "name", header: "Name", sortable: true },
@@ -40,10 +44,15 @@ const UsersTable: React.FC<UsersTableProps> = ({
           <Button variant="ghost" size="sm">
             <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => onEdit(row)}>
             <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="text-destructive">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive"
+            onClick={() => onDelete(row.id)}
+          >
             <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
           </Button>
         </div>
