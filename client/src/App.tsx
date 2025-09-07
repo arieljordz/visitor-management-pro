@@ -74,11 +74,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <SidebarProvider>
       <div className="min-h-screen bg-background">
         <Sidebar />
-        <ContentWrapper>
-          <Header />
-          <main className="flex-1">{children}</main>
+        <div
+          className={`flex flex-col flex-1 transition-all duration-300 ease-smooth`}
+        >
+          <ContentWrapper>
+            <Header />
+            <main className="flex-1 pb-8">{children}</main>
+          </ContentWrapper>
           <Footer />
-        </ContentWrapper>
+        </div>
       </div>
     </SidebarProvider>
   );

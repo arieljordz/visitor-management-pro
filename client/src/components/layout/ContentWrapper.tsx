@@ -8,12 +8,14 @@ interface ContentWrapperProps {
 const ContentWrapper: React.FC<ContentWrapperProps> = ({ children }) => {
   const { isOpen } = useSidebar();
 
-  return (
-    <div className={`transition-all duration-300 ease-smooth ${isOpen ? 'ml-64' : 'ml-16'}`}>
-      <div className="min-h-screen bg-background">
-        {children}
-      </div>
-    </div>
+   return (
+    <main
+      className={`flex-1 transition-all duration-300 ease-smooth ${
+        isOpen ? 'ml-64' : 'ml-16'
+      }`}
+    >
+      <div className="min-h-[calc(100vh-4rem)]">{children}</div>
+    </main>
   );
 };
 

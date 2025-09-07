@@ -4,6 +4,8 @@ import AdminTable, { Column } from "@/components/ui/AdminTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/utils/formatDate";
 import type { User } from "@/types";
 
 interface UsersTableProps {
@@ -32,10 +34,17 @@ const UsersTable: React.FC<UsersTableProps> = ({
       header: "Status",
       sortable: true,
       render: (_: any, row: User) => (
-        <span>{row.isEmailVerified ? "Active" : "Inactive"}</span>
+        <Badge variant={row.isEmailVerified ? "default" : "destructive"}>
+          {row.isEmailVerified ? "Active" : "Inactive"}
+        </Badge>
       ),
     },
-    { key: "createdAt", header: "Joined", sortable: true },
+    {
+      key: "createdAt",
+      header: "Joined",
+      sortable: true,
+      render: (_: any, row: User) => formatDate(row.createdAt),
+    },
     {
       key: "actions",
       header: "Actions",
@@ -44,7 +53,12 @@ const UsersTable: React.FC<UsersTableProps> = ({
           <Button variant="ghost" size="sm">
             <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(row)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-blue-400"
+            onClick={() => onEdit(row)}
+          >
             <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
           </Button>
           <Button

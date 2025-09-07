@@ -30,7 +30,7 @@ const Header: React.FC = () => {
   const { toggle } = useSidebar();
   const { theme, toggleTheme } = useTheme();
   const [searchValue, setSearchValue] = useState("");
-  const [isConfrimlOpen, setIsConfirmOpen] = useState(false);
+  const [isConfrimOpen, setIsConfirmOpen] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -159,7 +159,7 @@ const Header: React.FC = () => {
         </DropdownMenu>
       </div>
       <ActionConfirmModal
-        isOpen={isConfrimlOpen}
+        isOpen={isConfrimOpen}
         type="logout"
         message="Are you sure you want to logout?"
         onConfirm={handleLogout}

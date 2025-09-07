@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     try {
       const response = await authService.login(credentials);
-    //   console.log("credentials:",credentials);
+      console.log("response:",response);
       if (response.user) {
         dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
       } else {
