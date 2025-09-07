@@ -148,3 +148,20 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-top: 1px solid #e5e7eb; /* same as border-t */
+  background-color: var(--card-bg, #fff); /* matches bg-card */
+  padding: 1rem 1.5rem; /* px-6 py-4 */
+  font-size: 0.875rem; /* text-sm */
+  color: var(--muted-foreground, #6b7280); /* matches text-muted-foreground */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 40; /* keep above content */
+}
+

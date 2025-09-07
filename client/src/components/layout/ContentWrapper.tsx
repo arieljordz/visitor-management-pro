@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSidebar } from '../../context/SidebarContext';
+import { useSidebar } from '../../contexts/SidebarContext';
 
 interface ContentWrapperProps {
   children: React.ReactNode;

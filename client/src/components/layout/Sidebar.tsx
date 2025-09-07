@@ -10,7 +10,7 @@ import {
   faFileAlt,
   faHome
 } from '@fortawesome/free-solid-svg-icons';
-import { useSidebar } from '../../context/SidebarContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 
 interface MenuItem {
   id: string;
