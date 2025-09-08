@@ -1,6 +1,14 @@
-// src/components/common/PaginationControls.tsx
+// components/common/PaginationControls.tsx
 import React from "react";
-import { Button } from "@/components/ui/button";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 import {
   Select,
   SelectTrigger,
@@ -12,66 +20,116 @@ import {
 interface PaginationControlsProps {
   currentPage: number;
   totalPages: number;
-  setCurrentPage: (page: number) => void;
+  totalRecords: number;
   itemsPerPage: number;
-  setItemsPerPage: (count: number) => void;
-  totalItems: number;
+  onPageChange: (page: number) => void;
+  onItemsPerPageChange: (size: number) => void;
 }
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
   totalPages,
-  setCurrentPage,
+  totalRecords,
   itemsPerPage,
-  setItemsPerPage,
-  totalItems,
-}) => (
-  <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-    <div className="text-sm text-muted-foreground">
-      Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-      {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
-    </div>
+  onPageChange,
+  onItemsPerPageChange,
+}) => {
+  const renderPaginationItems = () => {
+    const pageNumbers: (number | "ellipsis")[] = [];
 
-    <div className="flex items-center gap-3">
-      {/* Page size selector */}
-      <span className="text-sm text-muted-foreground">Show</span>
-      <Select
-        value={String(itemsPerPage)}
-        onValueChange={(val) => setItemsPerPage(Number(val))}
-      >
-        <SelectTrigger className="w-[80px] h-8 px-2 text-sm">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="text-sm">
-          {[5, 10, 25, 50].map((size) => (
-            <SelectItem key={size} value={String(size)}>
-              {size}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+    } else {
+      pageNumbers.push(1);
+      if (currentPage > 3) pageNumbers.push("ellipsis");
 
-      {/* Prev/Next */}
-      <div className="flex space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage(Math.max(currentPage - 1, 1))}
-          disabled={currentPage === 1}
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      for (let i = start; i <= end; i++) pageNumbers.push(i);
+
+      if (currentPage < totalPages - 2) pageNumbers.push("ellipsis");
+      pageNumbers.push(totalPages);
+    }
+
+    return pageNumbers.map((num, idx) =>
+      num === "ellipsis" ? (
+        <PaginationItem key={`ellipsis-${idx}`}>
+          <PaginationEllipsis />
+        </PaginationItem>
+      ) : (
+        <PaginationItem key={num}>
+          <PaginationLink
+            isActive={currentPage === num}
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              onPageChange(num);
+            }}
+          >
+            {num}
+          </PaginationLink>
+        </PaginationItem>
+      )
+    );
+  };
+
+  return (
+    <div className="flex w-full items-center justify-between mt-4 text-sm text-muted-foreground">
+      {/* Left: Showing X entries out of Y */}
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        <span>Showing</span>
+        <Select
+          value={String(itemsPerPage)}
+          onValueChange={(val) => onItemsPerPageChange(Number(val))}
         >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage(Math.min(currentPage + 1, totalPages))}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </Button>
+          <SelectTrigger className="w-[80px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {[5, 10, 20, 50].map((size) => (
+              <SelectItem key={size} value={String(size)}>
+                {size}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span>
+          entries out of <strong>{totalRecords}</strong>
+        </span>
       </div>
+
+      {/* Right: Pagination numbers */}
+      <Pagination>
+        <PaginationContent>
+          {currentPage > 1 && (
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(currentPage - 1);
+                }}
+              />
+            </PaginationItem>
+          )}
+
+          {renderPaginationItems()}
+
+          {currentPage < totalPages && (
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onPageChange(currentPage + 1);
+                }}
+              />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+      </Pagination>
     </div>
-  </div>
-);
+  );
+};
 
 export default PaginationControls;

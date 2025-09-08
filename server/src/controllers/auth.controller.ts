@@ -90,25 +90,21 @@ export const register = asyncHandler(async (
 ) => {
   const { name, email, password } = req.body;
 
-  // Validation
   if (!name || !email || !password) {
     return next(new AppError("Please provide name, email and password", 400));
   }
 
-  // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new AppError("Email already in use", 400));
   }
 
-  // Create user
   const user = await User.create({ name, email, password });
-  const tokens = sendTokens(res, user);
 
+  // 🚨 Don't log them in if not verified
   res.status(201).json({
     success: true,
-    message: "User registered successfully",
-    accessToken: tokens.accessToken,
+    message: "User registered successfully. Please verify your email before logging in.",
     user: formatUserResponse(user),
   });
 });
@@ -121,19 +117,21 @@ export const login = asyncHandler(async (
 ) => {
   const { email, password } = req.body;
 
-  // Validation
   if (!email || !password) {
     return next(new AppError("Please provide email and password", 400));
   }
 
-  // Find user and include password for comparison
   const user = await User.findOne({ email }).select("+password");
 
   if (!user || !(await user.comparePassword(password))) {
     return next(new AppError("Invalid credentials", 401));
   }
 
-  // Generate tokens
+  // 🚨 Check if email verified
+  if (!user.isEmailVerified) {
+    return next(new AppError("Please verify your email before logging in", 403));
+  }
+
   const tokens = sendTokens(res, user);
 
   res.status(200).json({

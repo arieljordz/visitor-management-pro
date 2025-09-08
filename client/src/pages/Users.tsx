@@ -1,4 +1,4 @@
-// UsersPage.tsx
+// Users.tsx
 import React from "react";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,12 @@ import UserStats from "@/components/users/UserStats";
 import UserCreateModal from "@/components/users/UserCreateModal";
 import { useUsersData } from "@/hooks/useUsersData";
 import { Plus } from "lucide-react";
+import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";
 import ActionConfirmModal from "@/components/ui/ActionConfirmModal";
 
-const UsersPage: React.FC = () => {
+const Users: React.FC = () => {
   const {
     users,
     pagination,
@@ -20,7 +21,6 @@ const UsersPage: React.FC = () => {
     // State
     searchTerm,
     setSearchTerm,
-    currentPage,
     setCurrentPage,
     itemsPerPage,
     setItemsPerPage,
@@ -51,13 +51,11 @@ const UsersPage: React.FC = () => {
   if (isError) return <p>Failed to load users.</p>;
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground">Users Management</h1>
-        <p className="text-muted-foreground">
-          Manage your application users and their permissions.
-        </p>
-      </div>
+    <div className="p-6 space-y-6">
+      <PageHeader
+        title="Users Management"
+        description="Manage your application users and their permissions."
+      />
 
       <UserStats
         totalUsers={pagination?.totalUsers ?? 0}
@@ -93,14 +91,15 @@ const UsersPage: React.FC = () => {
           onDelete={requestDelete}
         />
 
-        {pagination && (
+        {/* ✅ Pagination */}
+        {pagination && pagination.totalPages > 1 && (
           <PaginationControls
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}
-            setCurrentPage={setCurrentPage}
+            totalRecords={pagination.totalUsers}
             itemsPerPage={itemsPerPage}
-            setItemsPerPage={setItemsPerPage}
-            totalItems={pagination.totalUsers}
+            onPageChange={setCurrentPage}
+            onItemsPerPageChange={setItemsPerPage}
           />
         )}
       </AdminCard>
@@ -108,7 +107,7 @@ const UsersPage: React.FC = () => {
       <UserCreateModal
         isOpen={isModalOpen}
         editingUser={editingUser}
-        onCancel={() => closeModal()}
+        onCancel={closeModal}
         onSave={handleSaveUser}
       />
       <ActionConfirmModal
@@ -122,4 +121,4 @@ const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage;
+export default Users;

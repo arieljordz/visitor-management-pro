@@ -1,49 +1,57 @@
-// components/ui/spinner.tsx
-import React from 'react';
-import { Building2 } from 'lucide-react';
+// components/ui/Spinner.tsx
+import React from "react";
+import { Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   message?: string;
+  fullscreen?: boolean;
 }
 
-const spinner: React.FC<SpinnerProps> = ({ 
-  size = 'md', 
-  message = 'Loading...' 
+const Spinner: React.FC<SpinnerProps> = ({
+  size = "md",
+  message,
+  fullscreen = false,
 }) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-8 h-8',
-    lg: 'w-12 h-12'
+    sm: "w-4 h-4 border-2",
+    md: "w-8 h-8 border-4", // ⚡ fixed: `border-3` isn’t valid in Tailwind
+    lg: "w-12 h-12 border-4",
   };
 
-  const containerSizeClasses = {
-    sm: 'p-4',
-    md: 'p-8',
-    lg: 'p-12'
-  };
+  const spinnerElement = (
+    <div
+      className={cn(
+        "rounded-full border-indigo-500 border-t-transparent animate-spin",
+        sizeClasses[size]
+      )}
+    />
+  );
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className={`flex flex-col items-center space-y-4 ${containerSizeClasses[size]}`}>
-        {/* App Icon */}
-        <div className="p-3 bg-indigo-600 rounded-full mb-2">
+  if (fullscreen) {
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-background/80 z-50">
+        <div className="p-3 bg-indigo-600 rounded-full mb-4">
           <Building2 className="h-8 w-8 text-white" />
         </div>
-        
-        {/* Spinner */}
-        <div 
-          className={`${sizeClasses[size]} border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin`}
-        ></div>
-        
-        {/* Message */}
-        <p className="text-gray-600 font-medium">{message}</p>
-        
-        {/* App Name */}
-        <p className="text-sm text-gray-500">Visitor Management System</p>
+        {spinnerElement}
+        {message && (
+          <p className="mt-4 text-sm text-muted-foreground">{message}</p>
+        )}
+        <p className="mt-1 text-xs text-gray-400">Visitor Management System</p>
       </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      {spinnerElement}
+      {message && (
+        <span className="text-sm text-muted-foreground">{message}</span>
+      )}
     </div>
   );
 };
 
-export default spinner;
+export default Spinner;

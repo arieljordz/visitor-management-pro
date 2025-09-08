@@ -1,7 +1,20 @@
 // contexts/AuthContext.tsx
-import React, { createContext, useContext, useReducer, useEffect, ReactNode, useCallback } from 'react';
-import { authService } from '../services/auth.service';
-import { User, LoginRequest, RegisterRequest, AuthState, AuthStatus } from '../types/auth.types';
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  ReactNode,
+  useCallback,
+} from "react";
+import { authService } from "../services/auth.service";
+import {
+  User,
+  LoginRequest,
+  RegisterRequest,
+  AuthState,
+  AuthStatus,
+} from "../types/auth.types";
 
 // Auth Context Type
 interface AuthContextType {
@@ -19,59 +32,59 @@ interface AuthContextType {
 
 // Action Types
 type AuthAction =
-  | { type: 'AUTH_LOADING' }
-  | { type: 'AUTH_SUCCESS'; payload: User }
-  | { type: 'AUTH_FAILURE'; payload: string }
-  | { type: 'AUTH_LOGOUT' }
-  | { type: 'CLEAR_ERROR' };
+  | { type: "AUTH_LOADING" }
+  | { type: "AUTH_SUCCESS"; payload: User }
+  | { type: "AUTH_FAILURE"; payload: string }
+  | { type: "AUTH_LOGOUT" }
+  | { type: "CLEAR_ERROR" };
 
 // Initial State
 const initialState: AuthState = {
   user: null,
-  status: 'idle',
+  status: "idle",
   error: null,
 };
 
 // Auth Reducer
 function authReducer(state: AuthState, action: AuthAction): AuthState {
   switch (action.type) {
-    case 'AUTH_LOADING':
+    case "AUTH_LOADING":
       return {
         ...state,
-        status: 'loading',
+        status: "loading",
         error: null,
       };
-    
-    case 'AUTH_SUCCESS':
+
+    case "AUTH_SUCCESS":
       return {
         ...state,
         user: action.payload,
-        status: 'authenticated',
+        status: "authenticated",
         error: null,
       };
-    
-    case 'AUTH_FAILURE':
+
+    case "AUTH_FAILURE":
       return {
         ...state,
         user: null,
-        status: 'error',
+        status: "error",
         error: action.payload,
       };
-    
-    case 'AUTH_LOGOUT':
+
+    case "AUTH_LOGOUT":
       return {
         ...state,
         user: null,
-        status: 'unauthenticated',
+        status: "unauthenticated",
         error: null,
       };
-    
-    case 'CLEAR_ERROR':
+
+    case "CLEAR_ERROR":
       return {
         ...state,
         error: null,
       };
-    
+
     default:
       return state;
   }
@@ -92,18 +105,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialize auth on app start
   useEffect(() => {
     const initializeAuth = async () => {
-      dispatch({ type: 'AUTH_LOADING' });
-      
+      dispatch({ type: "AUTH_LOADING" });
+
       try {
         const user = await authService.initialize();
-        
+
         if (user) {
-          dispatch({ type: 'AUTH_SUCCESS', payload: user });
+          dispatch({ type: "AUTH_SUCCESS", payload: user });
         } else {
-          dispatch({ type: 'AUTH_LOGOUT' });
+          dispatch({ type: "AUTH_LOGOUT" });
         }
       } catch (error) {
-        dispatch({ type: 'AUTH_FAILURE', payload: 'Failed to initialize authentication' });
+        dispatch({
+          type: "AUTH_FAILURE",
+          payload: "Failed to initialize authentication",
+        });
       }
     };
 
@@ -112,38 +128,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Login function
   const login = async (credentials: LoginRequest): Promise<void> => {
-    dispatch({ type: 'AUTH_LOADING' });
-    
+    dispatch({ type: "AUTH_LOADING" });
+
     try {
       const response = await authService.login(credentials);
-      console.log("response:",response);
-      if (response.user) {
-        dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
+
+      if (response.user?.isEmailVerified) {
+        dispatch({ type: "AUTH_SUCCESS", payload: response.user });
       } else {
-        throw new Error('No user data received');
+        throw new Error("Please verify your email before logging in");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Login failed';
-      dispatch({ type: 'AUTH_FAILURE', payload: message });
+      const message = error instanceof Error ? error.message : "Login failed";
+      dispatch({ type: "AUTH_FAILURE", payload: message });
       throw error;
     }
   };
 
   // Register function
   const register = async (userData: RegisterRequest): Promise<void> => {
-    dispatch({ type: 'AUTH_LOADING' });
-    
+    dispatch({ type: "AUTH_LOADING" });
+
     try {
       const response = await authService.register(userData);
-    //   console.log("userData:", userData);
+      //   console.log("userData:", userData);
       if (response.user) {
-        dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
+        dispatch({ type: "AUTH_SUCCESS", payload: response.user });
       } else {
-        throw new Error('No user data received');
+        throw new Error("No user data received");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration failed';
-      dispatch({ type: 'AUTH_FAILURE', payload: message });
+      const message =
+        error instanceof Error ? error.message : "Registration failed";
+      dispatch({ type: "AUTH_FAILURE", payload: message });
       throw error;
     }
   };
@@ -153,9 +170,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await authService.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
-      dispatch({ type: 'AUTH_LOGOUT' });
+      dispatch({ type: "AUTH_LOGOUT" });
     }
   };
 
@@ -163,25 +180,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshToken = async (): Promise<boolean> => {
     try {
       const success = await authService.refreshAccessToken();
-      
+
       if (success) {
         // Get updated user data
         const user = await authService.getCurrentUser();
-        dispatch({ type: 'AUTH_SUCCESS', payload: user });
+        dispatch({ type: "AUTH_SUCCESS", payload: user });
         return true;
       } else {
-        dispatch({ type: 'AUTH_LOGOUT' });
+        dispatch({ type: "AUTH_LOGOUT" });
         return false;
       }
     } catch (error) {
-      dispatch({ type: 'AUTH_LOGOUT' });
+      dispatch({ type: "AUTH_LOGOUT" });
       return false;
     }
   };
 
   // Clear error function
   const clearError = useCallback((): void => {
-    dispatch({ type: 'CLEAR_ERROR' });
+    dispatch({ type: "CLEAR_ERROR" });
   }, []);
 
   // Context value
@@ -189,8 +206,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user: state.user,
     status: state.status,
     error: state.error,
-    isLoading: state.status === 'loading',
-    isAuthenticated: state.status === 'authenticated' && !!state.user,
+    isLoading: state.status === "loading",
+    isAuthenticated: state.status === "authenticated" && !!state.user,
     login,
     register,
     logout,
@@ -198,21 +215,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshToken,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom Hook
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
-  
+
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
-  
+
   return context;
 };
 

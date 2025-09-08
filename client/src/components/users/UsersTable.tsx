@@ -50,9 +50,6 @@ const UsersTable: React.FC<UsersTableProps> = ({
       header: "Actions",
       render: (_: any, row: User) => (
         <div className="flex space-x-2">
-          <Button variant="ghost" size="sm">
-            <FontAwesomeIcon icon={faEye} className="h-4 w-4" />
-          </Button>
           <Button
             variant="ghost"
             size="sm"
