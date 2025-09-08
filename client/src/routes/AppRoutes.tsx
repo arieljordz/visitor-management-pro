@@ -6,6 +6,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard";
 import Users from "@/pages/Users";
+import Visitors from "@/pages/Visitors";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 // ---------------- Routes ----------------
@@ -43,6 +44,14 @@ const AppRoutes: React.FC = () => (
       element={
         <ProtectedRoute>
           <Users />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/visitors"
+      element={
+        <ProtectedRoute>
+          <Visitors />
         </ProtectedRoute>
       }
     />

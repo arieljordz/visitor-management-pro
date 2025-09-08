@@ -9,12 +9,12 @@ import React, {
 } from "react";
 import { authService } from "../services/auth.service";
 import {
-  User,
   LoginRequest,
   RegisterRequest,
   AuthState,
   AuthStatus,
 } from "../types/auth.types";
+import { User } from "../types/user.types";
 
 // Auth Context Type
 interface AuthContextType {
@@ -152,10 +152,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authService.register(userData);
       //   console.log("userData:", userData);
-      if (response.user) {
+      if (response.user?.isEmailVerified) {
         dispatch({ type: "AUTH_SUCCESS", payload: response.user });
       } else {
-        throw new Error("No user data received");
+        throw new Error("Please verify your email before logging in");
       }
     } catch (error) {
       const message =

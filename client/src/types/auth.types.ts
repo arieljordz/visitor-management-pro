@@ -1,4 +1,5 @@
 // types/auth.types.ts
+import type { User } from "@/types/user.types";
 
 // Form data interfaces
 export interface AuthFormData {
@@ -16,18 +17,6 @@ export interface RegisterRequest {
   name: string;
   email: string;
   password: string;
-}
-
-// User interface
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  avatar?: string;
-  isEmailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Auth response from backend

@@ -2,19 +2,11 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError, asyncHandler } from "../middleware/error.middleware";
 import User, { IUser } from "../models/User.model";
-import bcrypt from "bcryptjs";
-
-// Interface for authenticated request (after auth middleware)
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
+import type { AuthRequest } from "../types/auth.types";
 
 // Get all users (Admin only)
 export const getAllUsers = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     // 🔹 Query parameters
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
@@ -75,7 +67,7 @@ export const getAllUsers = asyncHandler(
 
 // Get user by ID
 export const getUserById = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const user = await User.findById(id).select("-password");
@@ -197,7 +189,7 @@ export const changePassword = asyncHandler(
 
 // Create user (Admin only)
 export const createUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { name, email, role, avatar } = req.body;
 
     // Validate required fields
@@ -230,7 +222,7 @@ export const createUser = asyncHandler(
 
 // Update user by ID (Admin only)
 export const updateUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const updates = req.body;
 
@@ -305,7 +297,7 @@ export const deleteAccount = asyncHandler(
 
 // Delete user by ID (Admin only)
 export const deleteUser = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
     const user = await User.findByIdAndDelete(id);
@@ -323,7 +315,7 @@ export const deleteUser = asyncHandler(
 
 // Get user statistics (Admin only)
 export const getUserStats = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const stats = await User.aggregate([
       {
         $group: {
@@ -385,7 +377,7 @@ export const getUserStats = asyncHandler(
 
 // Toggle user status (Admin only)
 export const toggleUserStatus = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const { isActive } = req.body;
 

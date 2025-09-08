@@ -1,0 +1,85 @@
+// UserTable.tsx
+import React from "react";
+import AdminTable, { Column } from "@/components/ui/AdminTable";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/utils/formatDate";
+import type { User } from "@/types/user.types";
+
+interface UserTableProps {
+  data: User[];
+  sortColumn: keyof User | "createdAt";
+  sortDirection: "asc" | "desc";
+  onSort: (column: keyof User | "createdAt") => void;
+  onEdit: (data: Partial<User>) => void;
+  onDelete: (id: string) => void;
+}
+
+const UserTable: React.FC<UserTableProps> = ({
+  data,
+  sortColumn,
+  sortDirection,
+  onSort,
+  onEdit,
+  onDelete,
+}) => {
+  const columns: Column[] = [
+    { key: "name", header: "Name", sortable: true },
+    { key: "email", header: "Email", sortable: true },
+    { key: "role", header: "Role", sortable: true },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      render: (_: any, row: User) => (
+        <Badge variant={row.isEmailVerified ? "default" : "destructive"}>
+          {row.isEmailVerified ? "Active" : "Inactive"}
+        </Badge>
+      ),
+    },
+    {
+      key: "createdAt",
+      header: "Joined",
+      sortable: true,
+      render: (_: any, row: User) => formatDate(row.createdAt),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      render: (_: any, row: User) => (
+        <div className="flex space-x-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-blue-400"
+            onClick={() => onEdit(row)}
+          >
+            <FontAwesomeIcon icon={faEdit} className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-destructive"
+            onClick={() => onDelete(row.id)}
+          >
+            <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <AdminTable
+      columns={columns}
+      data={data}
+      sortColumn={sortColumn}
+      sortDirection={sortDirection}
+      onSort={onSort}
+    />
+  );
+};
+
+export default UserTable;

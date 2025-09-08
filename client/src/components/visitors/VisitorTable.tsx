@@ -1,23 +1,22 @@
-// UsersTable.tsx
+// VisitorTable.tsx
 import React from "react";
 import AdminTable, { Column } from "@/components/ui/AdminTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/utils/formatDate";
-import type { User } from "@/types";
+import type { Visitor } from "@/types/visitor.types";
 
-interface UsersTableProps {
-  data: User[];
-  sortColumn: keyof User | "createdAt";
+interface VisitorTableProps {
+  data: Visitor[];
+  sortColumn: keyof Visitor | "createdAt";
   sortDirection: "asc" | "desc";
-  onSort: (column: keyof User | "createdAt") => void;
-  onEdit: (data: Partial<User>) => void;
+  onSort: (column: keyof Visitor | "createdAt") => void;
+  onEdit: (data: Partial<Visitor>) => void;
   onDelete: (id: string) => void;
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({
+const VisitorTable: React.FC<VisitorTableProps> = ({
   data,
   sortColumn,
   sortDirection,
@@ -26,29 +25,26 @@ const UsersTable: React.FC<UsersTableProps> = ({
   onDelete,
 }) => {
   const columns: Column[] = [
-    { key: "name", header: "Name", sortable: true },
-    { key: "email", header: "Email", sortable: true },
-    { key: "role", header: "Role", sortable: true },
     {
-      key: "status",
-      header: "Status",
+      key: "fullname",
+      header: "Name",
       sortable: true,
-      render: (_: any, row: User) => (
-        <Badge variant={row.isEmailVerified ? "default" : "destructive"}>
-          {row.isEmailVerified ? "Active" : "Inactive"}
-        </Badge>
-      ),
+      render: (_: any, row: Visitor) =>
+        row.fullname || `${row.firstname} ${row.lastname}`,
     },
+    { key: "email", header: "Email", sortable: true },
+    { key: "phone", header: "Phone", sortable: true },
+    { key: "company", header: "Company", sortable: true },
     {
       key: "createdAt",
-      header: "Joined",
+      header: "Created",
       sortable: true,
-      render: (_: any, row: User) => formatDate(row.createdAt),
+      render: (_: any, row: Visitor) => formatDate(row.createdAt),
     },
     {
       key: "actions",
       header: "Actions",
-      render: (_: any, row: User) => (
+      render: (_: any, row: Visitor) => (
         <div className="flex space-x-2">
           <Button
             variant="ghost"
@@ -82,4 +78,4 @@ const UsersTable: React.FC<UsersTableProps> = ({
   );
 };
 
-export default UsersTable;
+export default VisitorTable;

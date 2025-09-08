@@ -21,6 +21,7 @@ interface MenuItem {
 const menuItems: MenuItem[] = [
   { id: "dashboard", label: "Dashboard", icon: faTachometerAlt, path: "/dashboard" },
   { id: "users", label: "Users", icon: faUsers, path: "/users" },
+  { id: "visitors", label: "Visitors", icon: faUsers, path: "/visitors" },
   { id: "analytics", label: "Analytics", icon: faChartLine, path: "/analytics" },
   { id: "reports", label: "Reports", icon: faFileAlt, path: "/reports" },
   { id: "settings", label: "Settings", icon: faCog, path: "/settings" },

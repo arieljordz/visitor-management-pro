@@ -1,21 +1,21 @@
-// Users.tsx
+// Visitors.tsx
 import React from "react";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import AdminCard from "@/components/ui/AdminCard";
-import UsersTable from "@/components/users/UserTable";
-import UserStats from "@/components/users/UserStats";
-import UserCreateModal from "@/components/users/UserCreateModal";
-import { useUsersData } from "@/hooks/useUsersData";
+import VisitorsTable from "@/components/visitors/VisitorTable";
+import VisitorStats from "@/components/visitors/VisitorStats";
+import VisitorCreateModal from "@/components/visitors/VisitorCreateModal";
+import { useVisitorsData } from "@/hooks/useVisitorsData";
 import { Plus } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";
 import ActionConfirmModal from "@/components/ui/ActionConfirmModal";
 
-const Users: React.FC = () => {
+const Visitors: React.FC = () => {
   const {
-    users,
+    visitors,
     pagination,
 
     // State
@@ -33,38 +33,38 @@ const Users: React.FC = () => {
 
     // Modal
     isModalOpen,
-    editingUser,
+    editingVisitor,
     openCreateModal,
     openEditModal,
     closeModal,
 
     // Handlers
-    handleSaveUser,
+    handleSaveVisitor,
     handleSort,
     requestDelete,
     isConfirmOpen,
     setIsConfirmOpen,
     confirmDelete,
-  } = useUsersData();
+  } = useVisitorsData();
 
-  if (isLoading) return <p>Loading users...</p>;
-  if (isError) return <p>Failed to load users.</p>;
+  if (isLoading) return <p>Loading visitors...</p>;
+  if (isError) return <p>Failed to load visitors.</p>;
 
   return (
     <div className="p-6 space-y-6">
       <PageHeader
-        title="Users Management"
-        description="Manage your application users and their permissions."
+        title="Visitors Management"
+        description="Manage and monitor detailed visitor information."
       />
 
-      <UserStats
-        totalUsers={pagination?.totalRecords ?? 0}
-        activeUsers={0}
-        inactiveUsers={0}
+      <VisitorStats
+        totalVisitors={pagination?.totalRecords ?? 0}
+        activeVisitors={0}
+        inactiveVisitors={0}
       />
 
       <AdminCard
-        title="Users List"
+        title="Visitors List"
         icon={faUsers}
         headerActions={
           <Button
@@ -72,18 +72,18 @@ const Users: React.FC = () => {
             className="bg-primary hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4 mr-1" />
-            Add User
+            Add Visitor
           </Button>
         }
       >
         <SearchBar
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          placeholder="Search users..."
+          placeholder="Search visitors..."
         />
 
-        <UsersTable
-          data={users}
+        <VisitorsTable
+          data={visitors}
           sortColumn={sortColumn}
           sortDirection={sortOrder}
           onSort={handleSort}
@@ -104,13 +104,13 @@ const Users: React.FC = () => {
         )}
       </AdminCard>
 
-      <UserCreateModal
+      <VisitorCreateModal
         isOpen={isModalOpen}
-        editingUser={editingUser}
+        editingVisitor={editingVisitor}
         onCancel={closeModal}
-        onSave={handleSaveUser}
+        onSave={handleSaveVisitor}
       />
-
+      
       <ActionConfirmModal
         isOpen={isConfirmOpen}
         type="delete"
@@ -122,4 +122,4 @@ const Users: React.FC = () => {
   );
 };
 
-export default Users;
+export default Visitors;

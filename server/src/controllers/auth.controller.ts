@@ -2,16 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { Secret, SignOptions, JwtPayload } from "jsonwebtoken";
 import User, { IUser } from "../models/User.model";
 import { AppError, asyncHandler } from "../middleware/error.middleware";
-
-// Extend Request interface for authenticated requests
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-    name: string;
-    email: string;
-  };
-}
+import type { AuthRequest } from "../types/auth.types";
 
 // Interface for JWT payload
 interface TokenPayload extends JwtPayload {
@@ -84,7 +75,7 @@ const formatUserResponse = (user: IUser) => {
 
 // Register user
 export const register = asyncHandler(async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -111,7 +102,7 @@ export const register = asyncHandler(async (
 
 // Login user
 export const login = asyncHandler(async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -167,7 +158,7 @@ export const getMe = asyncHandler(async (
 
 // Refresh access token
 export const refreshToken = asyncHandler(async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -214,7 +205,7 @@ export const refreshToken = asyncHandler(async (
 
 // Logout user
 export const logout = asyncHandler(async (
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
