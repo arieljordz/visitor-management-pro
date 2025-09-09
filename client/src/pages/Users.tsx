@@ -8,7 +8,7 @@ import UserStats from "@/components/users/UserStats";
 import UserCreateModal from "@/components/users/UserCreateModal";
 import { useUsersData } from "@/hooks/useUsersData";
 import { Plus } from "lucide-react";
-import Spinner from "@/components/ui/Spinner";
+import Spinner from "@/components/ui/LoadingSpinner";
 import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";

@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
-import Spinner from "@/components/ui/Spinner";
+import Spinner from "@/components/ui/LoadingSpinner";
 
 // ---------------- Protected/Public Route Wrappers ----------------
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({

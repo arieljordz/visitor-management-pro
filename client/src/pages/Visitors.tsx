@@ -8,7 +8,7 @@ import VisitorStats from "@/components/visitors/VisitorStats";
 import VisitorCreateModal from "@/components/visitors/VisitorCreateModal";
 import { useVisitorsData } from "@/hooks/useVisitorsData";
 import { Plus } from "lucide-react";
-import Spinner from "@/components/ui/Spinner";
+import Spinner from "@/components/ui/LoadingSpinner";
 import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";

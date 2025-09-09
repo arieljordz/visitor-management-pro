@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
-import Spinner from "@/components/ui/Spinner";
+import Spinner from "@/components/ui/LoadingSpinner";
 
 // ---------------- Public Route Wrappers ----------------
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -9,7 +9,7 @@ import AppointmentCreateModal from "@/components/appointments/AppointmentCreateM
 import { useAppointmentsData } from "@/hooks/useAppointmentsData";
 import { useVisitorsData } from "@/hooks/useVisitorsData";
 import { Plus } from "lucide-react";
-import Spinner from "@/components/ui/Spinner";
+import Spinner from "@/components/ui/LoadingSpinner";
 import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";
