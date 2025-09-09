@@ -13,8 +13,10 @@ import AppRoutes from "@/routes/AppRoutes";
 
 const queryClient = new QueryClient();
 
-const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
-console.log("API_BASE_URL:", API_BASE_URL);
+// In App.tsx, add more debug logs:
+console.log("All env vars:", import.meta.env);
+console.log("VITE_BASE_API_URL:", import.meta.env.VITE_BASE_API_URL);
+console.log("NODE_ENV:", import.meta.env.NODE_ENV);
 // ---------------- App ----------------
 const App: React.FC = () => {
   return (

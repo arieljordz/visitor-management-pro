@@ -1,6 +1,6 @@
 import type { Appointment, AppointmentsResponse, AppointmentFormData } from "@/types/appointment.types";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_BASE_API_URL || "http://localhost:5000";
 const API_ENDPOINTS = {
   appointments: `${API_BASE_URL}/api/appointments`,
   stats: `${API_BASE_URL}/api/appointments/stats`,

@@ -1,6 +1,6 @@
 import type { Visitor, VisitorsResponse } from "@/types/visitor.types";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_BASE_API_URL || "http://localhost:5000";
 const API_ENDPOINTS = {
   visitors: `${API_BASE_URL}/api/visitors`,
   stats: `${API_BASE_URL}/api/visitors/stats`,
