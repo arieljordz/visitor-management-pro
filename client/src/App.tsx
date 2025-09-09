@@ -13,6 +13,8 @@ import AppRoutes from "@/routes/AppRoutes";
 
 const queryClient = new QueryClient();
 
+const API_BASE_URL = import.meta.env.VITE_BASE_API_URL;
+console.log("API_BASE_URL:", API_BASE_URL);
 // ---------------- App ----------------
 const App: React.FC = () => {
   return (

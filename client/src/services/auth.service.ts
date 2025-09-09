@@ -1,8 +1,9 @@
 // services/auth.service.ts
-import { AuthFormData, LoginRequest, RegisterRequest, AuthResponse, User } from "@/types/auth.types";
+import { LoginRequest, RegisterRequest, AuthResponse } from "@/types/auth.types";
+import {  User } from "@/types/user.types";
 
 // Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_BASE_API_URL || "http://localhost:5000";
 const API_ENDPOINTS = {
   register: `${API_BASE_URL}/api/auth/register`,
   login: `${API_BASE_URL}/api/auth/login`,
