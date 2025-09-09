@@ -8,6 +8,7 @@ import VisitorStats from "@/components/visitors/VisitorStats";
 import VisitorCreateModal from "@/components/visitors/VisitorCreateModal";
 import { useVisitorsData } from "@/hooks/useVisitorsData";
 import { Plus } from "lucide-react";
+import Spinner from "@/components/ui/Spinner";
 import PageHeader from "@/components/common/PageHeader";
 import SearchBar from "@/components/common/SearchBar";
 import PaginationControls from "@/components/common/PaginationControls";
@@ -15,39 +16,42 @@ import ActionConfirmModal from "@/components/ui/ActionConfirmModal";
 
 const Visitors: React.FC = () => {
   const {
+    // Data
     visitors,
     pagination,
 
-    // State
-    searchTerm,
-    setSearchTerm,
-    setCurrentPage,
-    itemsPerPage,
-    setItemsPerPage,
-    sortColumn,
-    sortOrder,
-
-    // Status
+    // Loading / error
     isLoading,
     isError,
 
-    // Modal
+    // Pagination / search / sort
+    setCurrentPage,
+    itemsPerPage,
+    setItemsPerPage,
+    searchTerm,
+    setSearchTerm,
+    sortColumn,
+    sortOrder,
+    handleSort,
+
+    // Modal / editing
     isModalOpen,
     editingVisitor,
     openCreateModal,
     openEditModal,
     closeModal,
 
-    // Handlers
-    handleSaveVisitor,
-    handleSort,
+    // Delete
     requestDelete,
     isConfirmOpen,
     setIsConfirmOpen,
     confirmDelete,
+
+    // CRUD
+    handleSaveVisitor,
   } = useVisitorsData();
 
-  if (isLoading) return <p>Loading visitors...</p>;
+  if (isLoading) return <Spinner fullscreen message="Loading..." />;
   if (isError) return <p>Failed to load visitors.</p>;
 
   return (
@@ -110,7 +114,7 @@ const Visitors: React.FC = () => {
         onCancel={closeModal}
         onSave={handleSaveVisitor}
       />
-      
+
       <ActionConfirmModal
         isOpen={isConfirmOpen}
         type="delete"

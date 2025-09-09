@@ -1,5 +1,5 @@
 // controllers/visitor.controller.ts
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AppError, asyncHandler } from "../middleware/error.middleware";
 import Visitor from "../models/Visitor.model";
 import type { AuthRequest } from "../types/auth.types";
@@ -30,7 +30,7 @@ export const getAllVisitors = asyncHandler(
     const totalVisitors = await Visitor.countDocuments(query);
 
     const visitors = await Visitor.find(query)
-      .populate("hostId", "firstname lastname email") // include host info
+      .populate("hostId", "name email role") // ✅ show host info correctly from User model
       .sort({ [sortColumn]: sortOrder })
       .skip(skip)
       .limit(limit)
@@ -68,10 +68,7 @@ export const getVisitorById = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    const visitor = await Visitor.findById(id).populate(
-      "hostId",
-      "firstname lastname email"
-    );
+    const visitor = await Visitor.findById(id).populate("hostId", "name email role");
 
     if (!visitor) {
       return next(new AppError("Visitor not found", 404));
@@ -88,10 +85,9 @@ export const getVisitorById = asyncHandler(
 // 📌 Create new visitor
 export const createVisitor = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const { firstname, middlename, lastname, email, phone, address, company } =
-      req.body;
+    const { firstname, middlename, lastname, email, phone, address, company } = req.body;
 
-    const hostId = req.user?.id;
+    const hostId = req.user?.id; // ✅ assign logged-in user as host
 
     if (!firstname || !lastname || !email || !phone || !address) {
       return next(new AppError("Missing required fields", 400));
@@ -142,7 +138,7 @@ export const updateVisitor = asyncHandler(
     const visitor = await Visitor.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    }).populate("hostId", "firstname lastname email");
+    }).populate("hostId", "name email role");
 
     if (!visitor) {
       return next(new AppError("Visitor not found", 404));

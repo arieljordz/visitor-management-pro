@@ -7,6 +7,7 @@ import Auth from "@/pages/Auth";
 import Dashboard from "@/pages/Dashboard";
 import Users from "@/pages/Users";
 import Visitors from "@/pages/Visitors";
+import Appointments from "@/pages/Appointments";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 // ---------------- Routes ----------------
@@ -52,6 +53,14 @@ const AppRoutes: React.FC = () => (
       element={
         <ProtectedRoute>
           <Visitors />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/appointments"
+      element={
+        <ProtectedRoute>
+          <Appointments />
         </ProtectedRoute>
       }
     />

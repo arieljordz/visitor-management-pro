@@ -1,21 +1,13 @@
 // models/Visitor.model.ts
 import mongoose, { Document, Schema } from "mongoose";
+import { IVisitor } from "../types/visitor.types";
 
-export interface IVisitor extends Document {
-  firstname: string;
-  middlename?: string;
-  lastname: string;
-  fullname?: string;
-  email: string;
-  phone: string;
-  address: string;
-  company?: string;
-  hostId: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+// Extend IVisitor with Mongoose `Document`
+export interface IVisitorDocument extends Omit<IVisitor, "id" | "hostId">, Document {
+  hostId: mongoose.Types.ObjectId; // actual DB reference
 }
 
-const visitorSchema = new Schema<IVisitor>(
+const visitorSchema = new Schema<IVisitorDocument>(
   {
     firstname: {
       type: String,
@@ -64,7 +56,7 @@ const visitorSchema = new Schema<IVisitor>(
     },
     hostId: {
       type: Schema.Types.ObjectId,
-      ref: "User", // reference User model
+      ref: "User",
       required: [true, "Host is required"],
     },
   },
@@ -72,6 +64,8 @@ const visitorSchema = new Schema<IVisitor>(
     timestamps: true,
     toJSON: {
       transform: function (doc, ret: any) {
+        ret.id = ret._id.toString();
+        delete ret._id;
         delete ret.__v;
         return ret;
       },
@@ -80,7 +74,7 @@ const visitorSchema = new Schema<IVisitor>(
 );
 
 // Pre-save hook to auto-generate fullname
-visitorSchema.pre<IVisitor>("save", function (next) {
+visitorSchema.pre<IVisitorDocument>("save", function (next) {
   const middleInitial = this.middlename
     ? `${this.middlename.charAt(0).toUpperCase()}.`
     : "";
@@ -96,4 +90,4 @@ visitorSchema.pre<IVisitor>("save", function (next) {
 visitorSchema.index({ email: 1 });
 visitorSchema.index({ createdAt: -1 });
 
-export default mongoose.model<IVisitor>("Visitor", visitorSchema);
+export default mongoose.model<IVisitorDocument>("Visitor", visitorSchema);

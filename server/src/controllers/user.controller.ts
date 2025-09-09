@@ -1,13 +1,13 @@
 // controllers/user.controller.ts
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { AppError, asyncHandler } from "../middleware/error.middleware";
-import User, { IUser } from "../models/User.model";
+import User, { IUserDocument } from "../models/User.model";
+import type { IUser } from "../types/user.types";
 import type { AuthRequest } from "../types/auth.types";
 
 // Get all users (Admin only)
 export const getAllUsers = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
-    // 🔹 Query parameters
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -16,7 +16,6 @@ export const getAllUsers = asyncHandler(
     const sortColumn = (req.query.sortColumn as string) || "createdAt";
     const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
 
-    // 🔹 Build query
     const query: Record<string, any> = {};
     if (search) {
       query.$or = [
@@ -25,24 +24,20 @@ export const getAllUsers = asyncHandler(
       ];
     }
 
-    // 🔹 Count first
     const totalUsers = await User.countDocuments(query);
 
-    // 🔹 Fetch users
     const users = await User.find(query)
       .select("-password")
       .sort({ [sortColumn]: sortOrder })
       .skip(skip)
       .limit(limit)
-      .lean(); // return plain JS objects
+      .lean();
 
-    // 🔹 Map _id → id
     const usersWithId = users.map((u) => ({
       ...u,
       id: u._id.toString(),
     }));
 
-    // 🔹 Pagination info
     const totalPages = Math.ceil(totalUsers / limit);
 
     res.status(200).json({
@@ -107,15 +102,13 @@ export const getProfile = asyncHandler(
 export const updateProfile = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
-    const { name, email, avatar } = req.body;
+    const { name, email, avatar } = req.body as Partial<IUser>;
 
-    // Check if user exists
     const existingUser = await User.findById(userId);
     if (!existingUser) {
       return next(new AppError("User not found", 404));
     }
 
-    // Check if email is being changed and if it already exists
     if (email && email !== existingUser.email) {
       const emailExists = await User.findOne({ email, _id: { $ne: userId } });
       if (emailExists) {
@@ -123,7 +116,6 @@ export const updateProfile = asyncHandler(
       }
     }
 
-    // Update allowed fields only
     const updateFields: Partial<IUser> = {};
     if (name) updateFields.name = name;
     if (email) updateFields.email = email;
@@ -148,35 +140,29 @@ export const changePassword = asyncHandler(
     const userId = req.user?.id;
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
 
-    // Validation
     if (!currentPassword || !newPassword || !confirmNewPassword) {
       return next(new AppError("Please provide all required fields", 400));
     }
-
     if (newPassword !== confirmNewPassword) {
       return next(new AppError("New passwords do not match", 400));
     }
-
     if (newPassword.length < 6) {
       return next(
         new AppError("New password must be at least 6 characters long", 400)
       );
     }
 
-    // Get user with password
     const user = await User.findById(userId).select("+password");
     if (!user) {
       return next(new AppError("User not found", 404));
     }
 
-    // Verify current password
     const isCurrentPasswordCorrect =
-      await user.comparePassword(currentPassword);
+      await (user as IUserDocument).comparePassword(currentPassword);
     if (!isCurrentPasswordCorrect) {
       return next(new AppError("Current password is incorrect", 400));
     }
 
-    // Update password (will be hashed by pre-save middleware)
     user.password = newPassword;
     await user.save();
 
@@ -190,20 +176,17 @@ export const changePassword = asyncHandler(
 // Create user (Admin only)
 export const createUser = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
-    const { name, email, role, avatar } = req.body;
+    const { name, email, role, avatar } = req.body as Partial<IUser>;
 
-    // Validate required fields
     if (!name || !email) {
       return next(new AppError("Name and email are required", 400));
     }
 
-    // Check if email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return next(new AppError("Email already in use", 400));
     }
 
-    // Create new user
     const user = await User.create({
       name,
       email,
@@ -224,16 +207,14 @@ export const createUser = asyncHandler(
 export const updateUser = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const updates = req.body;
+    const updates = req.body as Partial<IUser>;
 
-    // Prevent password update through this route
-    if (updates.password) {
+    if ((updates as any).password) {
       return next(
         new AppError("Password cannot be updated through this route", 400)
       );
     }
 
-    // Check if email is being changed and if it already exists
     if (updates.email) {
       const emailExists = await User.findOne({
         email: updates.email,
@@ -261,7 +242,7 @@ export const updateUser = asyncHandler(
   }
 );
 
-// Delete user account (current user)
+// Delete current user account
 export const deleteAccount = asyncHandler(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
@@ -273,19 +254,17 @@ export const deleteAccount = asyncHandler(
       );
     }
 
-    // Get user with password
     const user = await User.findById(userId).select("+password");
     if (!user) {
       return next(new AppError("User not found", 404));
     }
 
-    // Verify password
-    const isPasswordCorrect = await user.comparePassword(password);
+    const isPasswordCorrect =
+      await (user as IUserDocument).comparePassword(password);
     if (!isPasswordCorrect) {
       return next(new AppError("Incorrect password", 400));
     }
 
-    // Delete user
     await User.findByIdAndDelete(userId);
 
     res.status(200).json({
@@ -328,10 +307,10 @@ export const getUserStats = asyncHandler(
             $sum: { $cond: [{ $eq: ["$role", "user"] }, 1, 0] },
           },
           verifiedUsers: {
-            $sum: { $cond: ["$isEmailVerified", 1, 0] },
+            $sum: { $cond: [{ $eq: ["$isEmailVerified", true] }, 1, 0] },
           },
           unverifiedUsers: {
-            $sum: { $cond: [{ $not: "$isEmailVerified" }, 1, 0] },
+            $sum: { $cond: [{ $eq: ["$isEmailVerified", false] }, 1, 0] },
           },
         },
       },
@@ -341,7 +320,7 @@ export const getUserStats = asyncHandler(
       {
         $match: {
           createdAt: {
-            $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+            $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
           },
         },
       },

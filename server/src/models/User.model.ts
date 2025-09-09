@@ -1,20 +1,15 @@
 // models/User.model.ts
 import mongoose, { Document, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
+import { IUser } from "../types/user.types";
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
+// Extend IUser with Mongoose Document + password + methods
+export interface IUserDocument extends Omit<IUser, "id">, Document {
   password: string;
-  avatar?: string;
-  role: "user" | "admin";
-  isEmailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<IUserDocument>(
   {
     name: {
       type: String,
@@ -36,7 +31,7 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
-      select: false, // Don't include password in queries by default
+      select: false,
     },
     avatar: {
       type: String,
@@ -56,6 +51,8 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
     toJSON: {
       transform: function (doc, ret: any) {
+        ret.id = ret._id.toString(); // map _id to id
+        delete ret._id;
         delete ret.password;
         delete ret.__v;
         return ret;
@@ -65,7 +62,7 @@ const userSchema = new Schema<IUser>(
 );
 
 // Hash password before saving
-userSchema.pre<IUser>("save", async function (next) {
+userSchema.pre<IUserDocument>("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   try {
@@ -84,8 +81,8 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// Create indexes
+// Indexes
 userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
 
-export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<IUserDocument>("User", userSchema);

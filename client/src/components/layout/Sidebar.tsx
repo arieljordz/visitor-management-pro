@@ -2,13 +2,15 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faTachometerAlt,
-  faUsers,
-  faCog,
-  faChartLine,
-  faFileAlt,
-  faHome,
+  faTachometerAlt, // Dashboard
+  faUsers,         // Users
+  faUserFriends,   // Visitors
+  faCalendarAlt,   // Appointments
+  faChartLine,     // Analytics
+  faFileAlt,       // Reports
+  faCog,           // Settings
 } from "@fortawesome/free-solid-svg-icons";
+import { Building2 } from "lucide-react";
 import { useSidebar } from "@/contexts/SidebarContext";
 
 interface MenuItem {
@@ -19,10 +21,21 @@ interface MenuItem {
 }
 
 const menuItems: MenuItem[] = [
-  { id: "dashboard", label: "Dashboard", icon: faTachometerAlt, path: "/dashboard" },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: faTachometerAlt,
+    path: "/dashboard",
+  },
   { id: "users", label: "Users", icon: faUsers, path: "/users" },
-  { id: "visitors", label: "Visitors", icon: faUsers, path: "/visitors" },
-  { id: "analytics", label: "Analytics", icon: faChartLine, path: "/analytics" },
+  { id: "visitors", label: "Visitors", icon: faUserFriends, path: "/visitors" },
+  { id: "appointments", label: "Appointments", icon: faCalendarAlt, path: "/appointments" },
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: faChartLine,
+    path: "/analytics",
+  },
   { id: "reports", label: "Reports", icon: faFileAlt, path: "/reports" },
   { id: "settings", label: "Settings", icon: faCog, path: "/settings" },
 ];
@@ -52,16 +65,13 @@ const Sidebar: React.FC = () => {
           {/* Brand */}
           <div className="flex h-16 items-center justify-center border-b border-admin-sidebar-hover px-4">
             <div className="flex items-center">
-              <FontAwesomeIcon
-                icon={faHome}
-                className="text-2xl text-admin-sidebar-active"
-              />
+              <Building2 className="h-8 w-8 text-indigo-600 " />
               <span
                 className={`ml-3 text-lg font-semibold text-admin-sidebar-foreground hidden md:block transition-all duration-200 ${
                   isOpen ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
                 }`}
               >
-                AdminLTE
+                VMS Pro
               </span>
             </div>
           </div>

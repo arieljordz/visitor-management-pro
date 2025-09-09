@@ -1,12 +1,12 @@
-// hooks/useVisitorsData.ts
+// hooks/useAppointmentsData.ts
 import { useState, useCallback } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import visitorsService from "@/services/visitors.service";
-import type { Visitor, VisitorsResponse } from "@/types/visitor.types";
+import appointmentsService from "@/services/appointments.service";
+import type { Appointment, AppointmentsResponse, AppointmentFormData   } from "@/types/appointment.types";
 import { useDebouncedValue } from "./useDebouncedValue";
 
-export const useVisitorsData = () => {
+export const useAppointmentsData = () => {
   const queryClient = useQueryClient();
 
   // ------------------------------
@@ -15,7 +15,7 @@ export const useVisitorsData = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortColumn, setSortColumn] = useState<keyof Visitor | "createdAt">(
+  const [sortColumn, setSortColumn] = useState<keyof Appointment | "createdAt">(
     "createdAt"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
@@ -24,7 +24,7 @@ export const useVisitorsData = () => {
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   const handleSort = useCallback(
-    (column: keyof Visitor | "createdAt") => {
+    (column: keyof Appointment | "createdAt") => {
       setSortOrder((prev) =>
         sortColumn === column ? (prev === "asc" ? "desc" : "asc") : "asc"
       );
@@ -39,11 +39,11 @@ export const useVisitorsData = () => {
   }, []);
 
   // ------------------------------
-  // Fetch visitors
+  // Fetch appointments
   // ------------------------------
-  const { data, isLoading, isError } = useQuery<VisitorsResponse, Error>({
+  const { data, isLoading, isError } = useQuery<AppointmentsResponse, Error>({
     queryKey: [
-      "visitors",
+      "appointments",
       currentPage,
       itemsPerPage,
       debouncedSearchTerm,
@@ -51,7 +51,7 @@ export const useVisitorsData = () => {
       sortOrder,
     ],
     queryFn: async () => {
-      const res = await visitorsService.getAll(
+      const res = await appointmentsService.getAll(
         currentPage,
         itemsPerPage,
         debouncedSearchTerm,
@@ -62,63 +62,63 @@ export const useVisitorsData = () => {
     },
     placeholderData: () =>
       queryClient.getQueryData([
-        "visitors",
+        "appointments",
         currentPage - 1,
         itemsPerPage,
         debouncedSearchTerm,
         sortColumn,
         sortOrder,
-      ]) as VisitorsResponse,
+      ]) as AppointmentsResponse,
   });
 
-  const visitors = data?.data.visitors ?? [];
+  const appointments = data?.data.appointments ?? [];
   const pagination = data?.data.pagination;
 
   // ------------------------------
   // Modal / editing state
   // ------------------------------
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingVisitor, setEditingVisitor] = useState<Visitor | null>(null);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
 
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const openCreateModal = useCallback(() => {
-    setEditingVisitor(null);
+    setEditingAppointment(null);
     setIsModalOpen(true);
   }, []);
 
-  const openEditModal = useCallback((visitor: Visitor) => {
-    setEditingVisitor(visitor);
+  const openEditModal = useCallback((appointment: Appointment) => {
+    setEditingAppointment(appointment);
     setIsModalOpen(true);
   }, []);
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
-    setEditingVisitor(null);
+    setEditingAppointment(null);
   }, []);
 
   // ------------------------------
   // CRUD handlers
   // ------------------------------
-  const handleSaveVisitor = useCallback(
-    async (formData: Partial<Visitor>) => {
+  const handleSaveAppointment = useCallback(
+    async (formData: AppointmentFormData) => {
       try {
-        if (editingVisitor) {
-          await visitorsService.updateVisitor(editingVisitor.id, formData);
-          toast.success("Visitor updated successfully.");
+        if (editingAppointment) {
+          await appointmentsService.updateAppointment(editingAppointment.id, formData);
+          toast.success("Appointment updated successfully.");
         } else {
-          await visitorsService.createVisitor(formData);
-          toast.success("Visitor created successfully.");
+          await appointmentsService.createAppointment(formData);
+          toast.success("Appointment created successfully.");
         }
-        queryClient.invalidateQueries({ queryKey: ["visitors"] });
+        queryClient.invalidateQueries({ queryKey: ["appointments"] });
         closeModal();
       } catch (err: unknown) {
         if (err instanceof Error) toast.error(err.message);
-        console.error("❌ Error saving visitor:", err);
+        console.error("❌ Error saving appointment:", err);
       }
     },
-    [editingVisitor, closeModal, queryClient]
+    [editingAppointment, closeModal, queryClient]
   );
 
   const requestDelete = useCallback((id: string) => {
@@ -129,12 +129,12 @@ export const useVisitorsData = () => {
   const confirmDelete = useCallback(async () => {
     if (!confirmDeleteId) return;
     try {
-      await visitorsService.deleteVisitor(confirmDeleteId);
-      toast.success("Visitor deleted successfully.");
-      queryClient.invalidateQueries({ queryKey: ["visitors"] });
+      await appointmentsService.deleteAppointment(confirmDeleteId);
+      toast.success("Appointment deleted successfully.");
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
     } catch (err: unknown) {
-      console.error("❌ Error deleting visitor:", err);
-      toast.error("Failed to delete visitor.");
+      console.error("❌ Error deleting appointment:", err);
+      toast.error("Failed to delete appointment.");
     } finally {
       setConfirmDeleteId(null);
       setIsConfirmOpen(false);
@@ -146,7 +146,7 @@ export const useVisitorsData = () => {
   // ------------------------------
   return {
     // Data
-    visitors,
+    appointments,
     pagination,
 
     // Loading / error
@@ -167,7 +167,7 @@ export const useVisitorsData = () => {
 
     // Modal / editing
     isModalOpen,
-    editingVisitor,
+    editingAppointment,
     openCreateModal,
     openEditModal,
     closeModal,
@@ -179,6 +179,6 @@ export const useVisitorsData = () => {
     confirmDelete,
 
     // CRUD
-    handleSaveVisitor,
+    handleSaveAppointment,
   };
 };
